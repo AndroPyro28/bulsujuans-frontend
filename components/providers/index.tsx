@@ -4,7 +4,7 @@ import QueryProvider from "./query-provider";
 // import ModalProvider from "./ModalProvider";
 import { ThemeProvider } from "next-themes";
 import { SocketIoProvider } from "./socket-provider";
-
+import { Toaster } from "@/components/ui/sonner"
 const Provider: React.FC<React.PropsWithChildren> = ({ children }) => {
   return (
     <>
@@ -20,6 +20,7 @@ const Provider: React.FC<React.PropsWithChildren> = ({ children }) => {
             {/* <SessionProvider> */}
             {/* <ModalProvider /> */}
             {children}
+            <Toaster position="top-center"/>
             {/* </SessionProvider> */}
           </QueryProvider>
         </SocketIoProvider>

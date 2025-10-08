@@ -119,7 +119,12 @@ const LoginForm = () => {
     } catch (error) {
       toast.error("Something went wrong.");
     }
-  };
+  };  
+
+  const handleCancel = () => {
+    form.setValue('type', 'request-otp'); 
+    form.unregister('otp')
+  }
 
   return (
     <Form {...form}>
@@ -180,8 +185,7 @@ const LoginForm = () => {
           } else if (type === "verify-otp") {
             return (
               <>
-
-              <ArrowLeftCircle className="self-start text-orange-500 size-10 rounded-[50%]  p-2 cursor-pointer duration-200 hover:animate-pulse hover:bg-zinc-200 " />
+              <ArrowLeftCircle className="self-start text-orange-500 size-10 rounded-[50%]  p-2 cursor-pointer duration-200 hover:animate-pulse hover:bg-zinc-200 " onClick={handleCancel}/>
                 <div className="h-[150px] w-[150px] relative">
                   <Image
                     src={logo}

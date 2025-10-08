@@ -4,9 +4,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import qs from "query-string";
 
 const controller = new AbortController();
+console.log(process.env)
 
 export const apiClient = axios.create({
-  baseURL: `${process.env.BACKEND_URL}/api`,
+  baseURL: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`,
   headers: {
     "Content-type": "application/json",
     "Access-Control-Allow-Origin": "*",

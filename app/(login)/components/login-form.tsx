@@ -1,7 +1,6 @@
 "use client";
 import { Input } from "@/components/ui/input";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
-import { z } from "zod";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
 import {
@@ -12,48 +11,113 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Loader2 } from "lucide-react";
-// import { signIn } from "next-auth/react";
-import bulsuIcon from '@/public/assets/BSU.png'
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
+import { ArrowBigLeft, ArrowLeftCircle, ChevronLeft, Loader2 } from "lucide-react";
+import logo from "@/public/assets/app-logo.png";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-
-const formSchema = z.object({
-  email: z.email('Invalid Email').min(1, {
-    message: "This field is required",
-  }),
-});
-
-type formSchemaType = z.infer<typeof formSchema> | FieldValues;
-
+import { useMutateProcessor } from "@/hooks/useTanstackQuery";
+import { loginSchema, TLoginSchema } from "@/schema/login-schema";
+import axios from "axios";
+import { toast } from "sonner"
 const LoginForm = () => {
   const router = useRouter();
   const form = useForm({
     defaultValues: {
       email: "",
+      type: "request-otp",
     },
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(loginSchema),
     mode: "all",
   });
+  form.watch(["type"]);
 
+  type TLoginResponse = {
+    tokens: {
+      accessToken:string;
+      refreshToken: string
+    }
+  }
+  const login = useMutateProcessor<TLoginSchema, TLoginResponse>({
+    url: "/auth/login",
+    key: ["auth-login"],
+    method: "POST",
+  });
   const isLoading = form.formState.isSubmitting;
 
-  const onSubmit: SubmitHandler<formSchemaType> = async (values) => {
+  const onSubmit: SubmitHandler<TLoginSchema> = async (values) => {
     try {
-    //   const response = await signIn("credentials", {
-    //     ...values,
-    //     redirect: false,
-    //   });
+      const { type, email } = values;
+      const errorStyle =  {
+        background: 'red'
+      }
+      const successStyle =  {
+        background: 'green'
+      }
 
-    //   if (response?.error) {
-    //     toast.error("invalid credentials");
-    //   }
-
-    //   if (response?.ok && !response.error) {
-    //     toast.success("Logged In!");
-    //     router.refresh();
-      } catch (error) {
-    //   toast.error("Something went wrong.");
+      if (type === "request-otp") {
+        login.mutate(
+          {
+            type,
+            email,
+          },
+          {
+            onSuccess(data, variables, onMutateResult, context) {
+              form.setValue("type", "verify-otp");
+              toast.success("One time password has been sent to your email", {
+                style: successStyle
+              })
+            },
+            onError(error, variables, onMutateResult, context) {
+              if (axios.isAxiosError(error)) {
+                toast.error(error.response?.data.message, {
+                  style: errorStyle
+                })
+              } else {
+                console.error(error);
+              }
+            },
+          }
+        );
+      } else if (type === "verify-otp") {
+        const { otp } = values;
+        login.mutate(
+          {
+            type,
+            email,
+            otp,
+          },
+          {
+            onSuccess(data, variables, onMutateResult, context) {
+              toast.success("Login successful", {
+                style: successStyle
+              })
+              window.localStorage.setItem('access-token', data.tokens.accessToken)
+              window.localStorage.setItem('refresh-token', data.tokens.refreshToken)
+              window.location.assign('/dashboard')
+            },
+            onError(error, variables, onMutateResult, context) {
+              if (axios.isAxiosError(error)) {
+                toast.error(error.response?.data.message, {
+                  style: errorStyle
+                })
+                console.log("verify-otp response error", error);
+              } else {
+                console.error(error);
+              }
+            },
+          }
+        );
+      } else {
+        return null;
+      }
+     
+    } catch (error) {
+      toast.error("Something went wrong.");
     }
   };
 
@@ -61,53 +125,145 @@ const LoginForm = () => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="  flex flex-col w-[90%] md:w-[30%] items-center p-7 rounded-md z-10 font-sans gap-y-10 tracking-widest"
+        className=" flex flex-col w-[90%] md:w-[30%] items-center p-7 rounded-md z-10 font-sans gap-y-10 tracking-normal bg-white text-black"
+        autoComplete="off"
+        
       >
-        <div className="h-[110px] w-[110px] relative">
-          <Image
-            src={bulsuIcon}
-            className="object-contain"
-            alt="logo"
-            fill
-          />
-        </div>
-
-        <h1 className=" text-2xl font-semibold text-center mx-10 mt-5">
-          Sign in with email
-        </h1>
-
-        <p className="text-center">Lorem ipsum dolor sit amet consectetur adipisicing elit. Aperiam, in.</p>
-
-        <div className="flex flex-col items-center w-full gap-2 ">
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel className="uppercase text-md font-bold text-black dark:text-secondary/70">
-                  {/* Email */}
-                </FormLabel>
-                <FormControl>
-                  <Input
-                    disabled={isLoading}
-                    className=" p-5 bg-white border-0 focus-visible:ring-0 text-white  font-semibold placeholder:text-zinc-300"
-                    type="email"
-                    placeholder={`Enter email`}
-                    {...field}
+        {(() => {
+          const type = form.getValues("type");
+          if (type === "request-otp") {
+            return (
+              <>
+                <div className="h-[150px] w-[150px] relative">
+                  <Image
+                    src={logo}
+                    className="object-contain"
+                    alt="logo"
+                    fill
                   />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+                </div>
+
+                <h1 className=" text-3xl text-zinc-700 text-center mx-10 mt-5 ">
+                  Sign in with email
+                </h1>
+
+                <p className="text-md text-muted-foreground mt-1 text-center">
+                  Empowering students, one tap at a time.
+                </p>
+
+                <div className="flex flex-col items-center w-full gap-2 ">
+                  <FormField
+                    control={form.control}
+                    name="email"
+                    key={"email"}
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormLabel className="uppercase text-md font-bold text-black dark:text-secondary/70">
+                          {/* Email */}
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            disabled={isLoading}
+                            className="h-12 border-1 ring-1 ring-orange-400"
+                            type="email"
+                            placeholder={`Enter email`}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </>
+            );
+          } else if (type === "verify-otp") {
+            return (
+              <>
+
+              <ArrowLeftCircle className="self-start text-orange-500 size-10 rounded-[50%]  p-2 cursor-pointer duration-200 hover:animate-pulse hover:bg-zinc-200 " />
+                <div className="h-[150px] w-[150px] relative">
+                  <Image
+                    src={logo}
+                    className="object-contain"
+                    alt="logo"
+                    fill
+                  />
+                </div>
+
+                <h1 className=" text-3xl text-zinc-700 text-center mx-10 mt-5 ">
+                  Verify your email
+                </h1>
+
+                <p className="text-md text-muted-foreground mt-1 text-center">
+                  Please enter the one-time password sent to your email.
+                </p>
+
+                <div className="flex flex-col items-center w-full gap-2 ">
+                  <FormField
+                    control={form.control}
+                    name="otp"
+                    key={"otp"}
+                    render={({ field }) => {
+                      const otpSlotClassname =
+                        "border-[#cf8f82] border-2 rounded-md";
+                      return (
+                        <FormItem className="w-full flex justify-center">
+                          <FormLabel className="uppercase text-md font-bold text-black dark:text-secondary/70"></FormLabel>
+                          <FormControl>
+                            <InputOTP
+                              maxLength={6}
+                              {...field}
+                              className="border-black"
+                            >
+                              <InputOTPGroup className="flex space-x-5 border-0 ">
+                                <InputOTPSlot
+                                  index={0}
+                                  className={otpSlotClassname}
+                                />
+                                <InputOTPSlot
+                                  index={1}
+                                  className={otpSlotClassname}
+                                />
+                                <InputOTPSlot
+                                  index={2}
+                                  className={otpSlotClassname}
+                                />
+                                <InputOTPSlot
+                                  index={3}
+                                  className={otpSlotClassname}
+                                />
+                                <InputOTPSlot
+                                  index={4}
+                                  className={otpSlotClassname}
+                                />
+                                <InputOTPSlot
+                                  index={5}
+                                  className={otpSlotClassname}
+                                />
+                              </InputOTPGroup>
+                            </InputOTP>
+                          </FormControl>
+                        </FormItem>
+                      );
+                    }}
+                  />
+                </div>
+              </>
+            );
+          }
+          return null;
+        })()}
+
         <Button
           disabled={isLoading}
-          className="cursor-pointer p-2 w-full rounded-sm text-white text-md mt-5 flex justify-center disabled:cursor-not-allowed"
+          className="bg-orange-600 hover:bg-orange-700 transition-all duration-200 h-11 text-lg font-semibold w-full cursor-pointer"
         >
           {(() => {
+            const type = form.getValues("type");
             if (isLoading) return <Loader2 className="animate-spin " />;
-            return "Login";
+
+            return type === "request-otp" ? "Login" : "Verify";
           })()}
         </Button>
       </form>

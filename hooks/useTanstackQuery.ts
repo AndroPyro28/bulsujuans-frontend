@@ -4,7 +4,6 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import qs from "query-string";
 
 const controller = new AbortController();
-console.log(process.env)
 
 export const apiClient = axios.create({
   baseURL: `${process.env.NEXT_PUBLIC_BACKEND_URL}/api`,
@@ -18,7 +17,7 @@ export const apiClient = axios.create({
 
 apiClient.interceptors.request.use(
   async (config) => {
-    const token = localStorage.getItem("access_token");
+    const token = localStorage.getItem("access-token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -56,11 +55,7 @@ type queryFnProps = {
   headers?: any | {};
 };
 
-export const queryFn = async <T>({
-  url,
-  queryParams = {},
-  headers = {},
-}: queryFnProps) => {
+export const queryFn = async <T>({ url, queryParams = {}, headers = {} }: queryFnProps) => {
   const newUrl = qs.stringifyUrl({
     url,
     query: { ...queryParams },
@@ -105,13 +100,7 @@ type mutationFnProps<T> = {
   value: T;
 };
 
-export const mutationFn = async <T>({
-  url,
-  queryParams = {},
-  method,
-  value,
-  headers = {},
-}: mutationFnProps<T>) => {
+export const mutationFn = async <T>({ url, queryParams = {}, method, value, headers = {} }: mutationFnProps<T>) => {
   const newUrl = qs.stringifyUrl({
     url,
     query: { ...queryParams },
@@ -171,16 +160,13 @@ export const useMutateProcessor = <T, K>({
   const queryClient = useQueryClient();
   return useMutation({
     ...options,
-    mutationFn: async (value: T) =>
-      mutationFn<T>({ url, queryParams, method, value, headers }) as K,
+    mutationFn: async (value: T) => mutationFn<T>({ url, queryParams, method, value, headers }) as K,
     onMutate: (data: T) => {
       const previousData = queryClient.getQueryData<T>(key);
       if (Array.isArray(previousData)) {
         queryClient.setQueryData(key, (old: any[]) => {
-          if (method === "DELETE")
-            return old.filter((value) => value?.id != data);
-          if (method === "POST")
-            return Array.isArray(data) ? [...old, ...data] : [...old, data];
+          if (method === "DELETE") return old.filter((value) => value?.id != data);
+          if (method === "POST") return Array.isArray(data) ? [...old, ...data] : [...old, data];
         });
       }
       return { previousData };

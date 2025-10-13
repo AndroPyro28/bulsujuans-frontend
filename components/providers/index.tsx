@@ -11,7 +11,7 @@ const Provider: React.FC<React.PropsWithChildren> = ({ children }) => {
     <>
       <ThemeProvider
         attribute="class"
-        defaultTheme="system"
+        defaultTheme="light"
         enableSystem
         disableTransitionOnChange
         storageKey="bulsujuans"

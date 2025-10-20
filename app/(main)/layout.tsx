@@ -14,11 +14,11 @@ const DashboardLayout = ({ children }: DashboardLayoutPops) => {
   return (
     <SidebarProvider defaultOpen={isOpen} onOpenChange={handleChange} open={isOpen}>
       <AppSidebar />
-      <main className="w-full min-h-screen flex flex-col">
+      <main className="w-full flex flex-col">
         <div className="w-full p-2 lg:px-8 sticky top-0 flex justify-between items-center border-b bg-background">
           <SidebarTrigger className="cursor-pointer" />
         </div>
-        <div className="p-2 lg:p-8 overflow-auto">{children}</div>
+        <div className="overflow-auto w-full h-full">{children}</div>
       </main>
     </SidebarProvider>
   );

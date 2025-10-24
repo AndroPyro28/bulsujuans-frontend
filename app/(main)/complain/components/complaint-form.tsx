@@ -1,29 +1,18 @@
 "use client";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Loader2, NotepadText } from "lucide-react";
+import { Form } from "@/components/ui/form";
+import { NotepadText } from "lucide-react";
 import React from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Button } from "@/components/ui/button";
+import { useForm } from "react-hook-form";
+import { FormInput } from "@/components/form/form-input";
+import { FormSearch } from "@/components/form/form-search-input";
+import { FormTextarea } from "@/components/form/form-textarea";
+import { FormCheckbox } from "@/components/form/form-checkbox";
+import { FormDate } from "@/components/form/form-data";
+import { FormSubmitButton } from "@/components/form/form-submit-button";
 
 export const ComplaintForm = () => {
+  const isSubmitting = false; // || mutation.isPending || complaintOptionsQuery.isLoading
+
   const form = useForm({
     defaultValues: {
       victimName: "",
@@ -37,263 +26,115 @@ export const ComplaintForm = () => {
     },
     // resolver: zodResolver({}),
     mode: "all",
+    disabled: isSubmitting,
   });
 
-  const isLoading = false;
-  const complaintsOption = [
+  const isDisabled = form.formState.disabled;
+
+  const complaintsOptions = [
     {
-      id: "1",
-      name: "harassment",
+      value: "1",
+      label: "harassment",
     },
     {
-      id: "2",
-      name: "Suicide or self-injury",
+      value: "2",
+      label: "Suicide or self-injury",
     },
     {
-      id: "3",
-      name: "violence or dangerous organizations",
+      value: "3",
+      label: "violence or dangerous organizations",
     },
     {
-      id: "4",
-      name: "Nudity or sexual activity",
+      value: "4",
+      label: "Nudity or sexual activity",
     },
     {
-      id: "5",
-      name: "Selling or promoting of restricted items",
+      value: "5",
+      label: "Selling or promoting of restricted items",
     },
     {
-      id: "6",
-      name: "Scam or fraud",
+      value: "6",
+      label: "Scam or fraud",
     },
   ];
 
+  const onSubmit = (data: any) => {
+    console.log("Submitted:", data);
+  };
+
   return (
-    <div className="bg-white w-[90%] h-[90%] rounded-2xl shadow-2xl p-5 overflow-y-auto">
+    <div className="bg-white w-full rounded-2xl shadow-2xl p-5 overflow-y-auto">
       <div className="flex">
-        <NotepadText className="text-md font-light" />{" "}
-        <h1 className="text-md font-light"> Complain Form</h1>
+        <NotepadText className="text-md font-light" /> <h1 className="text-md font-light"> Complain Form</h1>
       </div>
 
       <Form {...form}>
-        <form autoComplete="off" className="flex flex-col">
+        <form onSubmit={form.handleSubmit(onSubmit)} autoComplete="off" className="flex flex-col">
           <section className="victim-information my-10 space-y-5 p-2">
             <h2 className="font-bold">Victim Information</h2>
 
-            <FormField
-              control={form.control}
-              name="victimName"
-              key={"victimName"}
-              render={({ field }) => (
-                <FormItem className="w-full ">
-                  <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-secondary/70 ">
-                    Victim Name
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      // disabled={isLoading}
-                      className=" bg-[#ebebeb] min-w-[50%] border-0 focus-visible:ring-0 text-black focus-visible:ring-offset-0"
-                      type="text"
-                      placeholder={`Enter victim name`}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <FormInput control={form.control} name="victimName" label="Victim Name" placeholder="enter your name" />
 
-            <FormField
+            <FormInput
+              type="number"
               control={form.control}
               name="contactNo"
-              key={"contactNo"}
-              render={({ field }) => (
-                <FormItem className="w-full ">
-                  <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-secondary/70 ">
-                    Contact Number
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      // disabled={isLoading}
-                      className=" bg-[#ebebeb] min-w-[50%] border-0 focus-visible:ring-0 text-black focus-visible:ring-offset-0"
-                      type="number"
-                      placeholder={`Enter contact number`}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="Contact Number"
+              placeholder="enter contact number"
             />
 
-            <FormField
+            <FormInput
+              type="number"
               control={form.control}
               name="alternateMobileNo"
-              key={"alternateMobileNo"}
-              render={({ field }) => (
-                <FormItem className="w-full ">
-                  <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-secondary/70 ">
-                    Alternate Mobile Number
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      // disabled={isLoading}
-                      className=" bg-[#ebebeb] min-w-[50%] border-0 focus-visible:ring-0 text-black focus-visible:ring-offset-0"
-                      type="number"
-                      placeholder={`Enter alternate mobile number`}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="Alternate Mobile Number"
+              placeholder="enter alternate mobile number"
             />
 
-            <FormField
-              control={form.control}
-              name="email"
-              key={"email"}
-              render={({ field }) => (
-                <FormItem className="w-full ">
-                  <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-secondary/70 ">
-                    Email
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      // disabled={isLoading}
-                      className=" bg-[#ebebeb] min-w-[50%] border-0 focus-visible:ring-0 text-black focus-visible:ring-offset-0"
-                      type="email"
-                      placeholder={`Enter email`}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <FormInput type="number" control={form.control} name="email" label="Email" placeholder="your email" />
           </section>
 
           <section className="complaint-details my-10 space-y-5 p-2">
             <h2 className="font-bold">Complaint Details</h2>
 
-            <FormField
+            <FormSearch
               control={form.control}
               name="typeOfComplaint"
-              key="typeOfComplaint"
-              render={({ field }) => (
-                <FormItem className="w-full ">
-                  <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-zinc-400">
-                    Type of Complaint
-                  </FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    disabled={isLoading}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-full bg-[#ebebeb] min-w-[50%] border-0 focus-visible:ring-0 text-black focus-visible:ring-offset-0">
-                        <SelectValue placeholder="Type of complaint" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {complaintsOption.map((complaint) => (
-                        <SelectItem value={complaint.id} key={complaint.id}>
-                          {complaint.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="Type of Complaint"
+              options={complaintsOptions}
             />
 
-            <FormField
+            <FormTextarea
               control={form.control}
               name="incidentDetails"
-              key={"incidentDetails"}
-              render={({ field }) => (
-                <FormItem className="w-full ">
-                  <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-secondary/70 ">
-                    Incident Description / Details
-                  </FormLabel>
-                  <FormControl>
-                    <Textarea
-                      disabled={isLoading}
-                      className=" bg-[#ebebeb] min-w-[50%] border-0 focus-visible:ring-0 text-black focus-visible:ring-offset-0"
-                      placeholder={`Enter details of incident`}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="Incident Description / Details"
+              placeholder="Enter details of incident"
+              rows={5}
             />
 
-            <FormField
+            <FormDate
+              type="datetime-local"
               control={form.control}
               name="dateAndTime"
-              key="dateAndTime"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-zinc-400">
-                    Date and Time of Incident
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="datetime-local"
-                      disabled={isLoading}
-                      className="bg-[#ebebeb] min-w-[50%] border-0 focus-visible:ring-0 text-black focus-visible:ring-offset-0"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              label="Date and Time of Incident"
+              placeholder=""
             />
 
-            <div className="w-full ">
-              <FormField
-                control={form.control}
-                name="remainAnonymous"
-                key="remainAnonymous"
-                render={({ field }) => (
-                  <FormItem className="w-full flex ">
-                    <FormControl>
-                      <Checkbox
-                        className="cursor-pointer"
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
-
-                    <FormLabel className="uppercase text-xs font-bold text-zinc-500 dark:text-zinc-400 cursor-pointer">
-                      I wish to remain anonymous.
-                    </FormLabel>
-
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormCheckbox
+              control={form.control}
+              name="remainAnonymous"
+              label="I wish to remain anonymous."
+              description="Selecting this option will hide your identity from the complaint review process."
+            />
           </section>
 
-          <Button
-            variant={"default"}
-            type="submit"
-            className=" dark:text-white cursor-pointer self-end"
-            disabled={isLoading}
-          >
-            {(() => {
-              if (isLoading)
-                return (
-                  <div className="flex items-center gap-x-3">
-                    {" "}
-                    Submitting <Loader2 size={20} />
-                  </div>
-                );
-              return "Submit complain";
-            })()}
-          </Button>
+          <FormSubmitButton
+            label="Submit Complain"
+            submittingLabel="Submitting"
+            disabled={isDisabled}
+            isSubmitting={isSubmitting}
+            onClear={() => form.reset()} // shows the clear button only when provided
+          />
         </form>
       </Form>
     </div>

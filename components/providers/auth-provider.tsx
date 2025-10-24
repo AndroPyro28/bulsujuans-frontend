@@ -39,7 +39,14 @@ export const AuthContext = createContext<AuthContextType>({
 
 const authRoutePatterns = [
   /^\/dashboard(\/.*)?$/, // matches "/dashboard" and anything starting with "/dashboard/"
-  /^\/profile(\/.*)?$/, // matches "/profile" and nested routes like "/profile/edit"
+  /^\/complain(\/.*)?$/,
+  /^\/emergency(\/.*)?$/,
+  /^\/news(\/.*)?$/,
+  /^\/profile(\/.*)?$/,
+  /^\/services(\/.*)?$/,
+  /^\/tickets(\/.*)?$/,
+  /^\/users(\/.*)?$/,
+  /^\/users(\/.*)?$/,
 ];
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {

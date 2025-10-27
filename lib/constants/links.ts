@@ -40,6 +40,12 @@ export const generaLinks: MenuLinkType[] = [
     access: Permission.TICKETS_VIEW_LIST,
   },
   {
+    title: "My Complaints",
+    url: "/complaints",
+    icon: Tickets,
+    access: Permission.COMPLAINT_VIEW_LIST,
+  },
+  {
     title: "Users",
     url: "/users",
     icon: LayoutDashboard,

@@ -1,7 +1,7 @@
 import React from "react";
 import { ComplaintForm } from "./components/complaint-form";
 
-const ComplaintPage = () => {
+const CreateComplaintsPage = () => {
   return (
     <div className="bg-[#eeeeee] w-full h-full flex justify-center items-center p-10">
       <ComplaintForm />
@@ -9,4 +9,4 @@ const ComplaintPage = () => {
   );
 };
 
-export default ComplaintPage;
+export default CreateComplaintsPage;

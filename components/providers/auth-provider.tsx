@@ -46,7 +46,7 @@ const authRoutePatterns = [
   /^\/services(\/.*)?$/,
   /^\/tickets(\/.*)?$/,
   /^\/users(\/.*)?$/,
-  /^\/users(\/.*)?$/,
+  /^\/complaints(\/.*)?$/,
 ];
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {

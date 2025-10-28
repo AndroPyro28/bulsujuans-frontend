@@ -9,6 +9,9 @@ import { FormTextarea } from "@/components/form/form-textarea";
 import { FormCheckbox } from "@/components/form/form-checkbox";
 import { FormDate } from "@/components/form/form-data";
 import { FormSubmitButton } from "@/components/form/form-submit-button";
+import { useMutateProcessor } from "@/hooks/useTanstackQuery";
+import { TStoreComplaintSchema } from "@/schema/complaints";
+import { useAuth } from "@/hooks/useAuth";
 
 export const ComplaintForm = () => {
   const isSubmitting = false; // || mutation.isPending || complaintOptionsQuery.isLoading
@@ -29,37 +32,54 @@ export const ComplaintForm = () => {
     disabled: isSubmitting,
   });
 
-  const isDisabled = form.formState.disabled;
+const addComplaint = useMutateProcessor<TStoreComplaintSchema, unknown>({
+  url: '/complaints/store',
+  key: ['complaints'],
+  method: 'POST',
+})
 
+const { user } = useAuth()
+
+  const isDisabled = form.formState.disabled;
   const complaintsOptions = [
     {
-      value: "1",
+      value: "harassment",
       label: "harassment",
     },
     {
-      value: "2",
+      value: "suicide_or_self_injury",
       label: "Suicide or self-injury",
     },
     {
-      value: "3",
+      value: "violence_or_dangerous_organizations",
       label: "violence or dangerous organizations",
     },
     {
-      value: "4",
+      value: "nudity_or_sexual_activity",
       label: "Nudity or sexual activity",
     },
     {
-      value: "5",
+      value: "selling_or_promoting_of_restricted_items",
       label: "Selling or promoting of restricted items",
     },
     {
-      value: "6",
+      value: "scam_or_fraud",
       label: "Scam or fraud",
     },
   ];
-
+  
   const onSubmit = (data: any) => {
     console.log("Submitted:", data);
+    addComplaint.mutate({
+      name: data.victimName,
+      email: data.email,
+      contact_number: data.contactNo.toString(),
+      alternate_contact_number: data.alternateMobileNo.toString(),
+      incident_detail: data.incidentDetails,
+      complaint_type: data.typeOfComplaint,
+      date_of_incident: data.dateAndTime,
+      complainant_id: user?.id as string
+    })
   };
 
   return (
@@ -73,7 +93,7 @@ export const ComplaintForm = () => {
           <section className="victim-information my-10 space-y-5 p-2">
             <h2 className="font-bold">Victim Information</h2>
 
-            <FormInput control={form.control} name="victimName" label="Victim Name" placeholder="enter your name" />
+            <FormInput control={form.control} name="victimName" label="Victim Name" placeholder="enter victim name" />
 
             <FormInput
               type="number"
@@ -91,7 +111,7 @@ export const ComplaintForm = () => {
               placeholder="enter alternate mobile number"
             />
 
-            <FormInput type="number" control={form.control} name="email" label="Email" placeholder="your email" />
+            <FormInput type="email" control={form.control} name="email" label="Email" placeholder="your email" />
           </section>
 
           <section className="complaint-details my-10 space-y-5 p-2">

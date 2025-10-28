@@ -8,7 +8,7 @@ import AppSidebarLinkGroup from "./app-sidebar-link-group";
 
 const AppSidebarMenu = () => {
   const { state } = useSidebar();
-  const { hasPermission } = useAuth();
+  const { hasPermission, user } = useAuth();
   const [collapsible, setCollapsible] = useState(false);
 
   const isCollapse = state === "collapsed";
@@ -24,12 +24,13 @@ const AppSidebarMenu = () => {
 
   const filteredLinks = useMemo(
     () => ({
-      general: generaLinks, //filterLinksByPermission(generaLinks) todo: update seeder and uncomment this code
+      general: filterLinksByPermission(generaLinks), //filterLinksByPermission(generaLinks) todo: update seeder and uncomment this code
       forYou: filterLinksByPermission(forYouLinks),
     }),
     [filterLinksByPermission]
   );
 
+  console.log(filteredLinks, user)
   return (
     <SidebarContent>
       {isCollapse && filteredLinks.general.length > 0 && <SidebarSeparator />}

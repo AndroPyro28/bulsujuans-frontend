@@ -30,7 +30,6 @@ const AppSidebarMenu = () => {
     [filterLinksByPermission]
   );
 
-  console.log(filteredLinks, user)
   return (
     <SidebarContent>
       {isCollapse && filteredLinks.general.length > 0 && <SidebarSeparator />}

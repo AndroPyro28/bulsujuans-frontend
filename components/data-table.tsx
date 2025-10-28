@@ -13,32 +13,21 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dispatch, SetStateAction, useState } from "react";
 import { Button } from "./ui/button";
+import { useSetQuery } from "@/hooks/use-set-query";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  globalFilter?: string;
-  setGlobalFilter?: Dispatch<SetStateAction<string>>;
+  pageCount: number;
+  currentPage: number;
 }
 
-export function DataTable<TData, TValue>({
-  columns,
-  data,
-  globalFilter,
-  setGlobalFilter,
-}: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({ columns, data, pageCount, currentPage }: DataTableProps<TData, TValue>) {
+  const { setQuery } = useSetQuery();
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
     id: false,
   });
@@ -46,20 +35,18 @@ export function DataTable<TData, TValue>({
   const table = useReactTable({
     data,
     columns,
-    onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     state: {
       sorting,
       columnVisibility,
-      columnFilters,
-      globalFilter,
     },
+    manualPagination: true,
+    manualFiltering: true,
+    pageCount,
   });
 
   return (
@@ -71,12 +58,7 @@ export function DataTable<TData, TValue>({
               {headerGroup.headers.map((header) => {
                 return (
                   <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
                   </TableHead>
                 );
               })}
@@ -86,15 +68,9 @@ export function DataTable<TData, TValue>({
         <TableBody>
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-                className=" border-none"
-              >
+              <TableRow key={row.id} data-state={row.getIsSelected() && "selected"} className=" border-none">
                 {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
+                  <TableCell key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</TableCell>
                 ))}
               </TableRow>
             ))
@@ -108,26 +84,73 @@ export function DataTable<TData, TValue>({
         </TableBody>
       </Table>
 
-      <div className="flex items-center justify-end space-x-2 py-4">
-        <Button
-          className=" dark:text-white bg-transparent"
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
-          disabled={!table.getCanPreviousPage()}
-        >
-          Previous
-        </Button>
-        <Button
-          className=" dark:text-white bg-transparent"
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
-          disabled={!table.getCanNextPage()}
-        >
-          Next
-        </Button>
+      <div className="flex items-center justify-between py-4">
+        <span className="text-sm font-medium">
+          Page {currentPage} of {pageCount}
+        </span>
+        <div className="space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setQuery({ page: currentPage! - 1 })}
+            disabled={currentPage <= 1}
+          >
+            Previous
+          </Button>
+
+          {getPageNumbers(currentPage, pageCount).map((page, i) =>
+            page === "..." ? (
+              <span key={i} className="px-2">
+                ...
+              </span>
+            ) : (
+              <Button
+                key={i}
+                variant={page === currentPage ? "default" : "outline"}
+                size="sm"
+                onClick={() => setQuery({ page: Number(page) })}
+              >
+                {page}
+              </Button>
+            )
+          )}
+
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setQuery({ page: currentPage + 1 })}
+            disabled={currentPage >= pageCount}
+          >
+            Next
+          </Button>
+        </div>
       </div>
     </div>
   );
+}
+
+function getPageNumbers(current: number, total: number, delta = 2) {
+  const range: (number | string)[] = [];
+  const rangeWithDots: (number | string)[] = [];
+  let last: number | undefined;
+
+  for (let i = 1; i <= total; i++) {
+    if (i === 1 || i === total || (i >= current - delta && i <= current + delta)) {
+      range.push(i);
+    }
+  }
+
+  for (const i of range) {
+    if (last) {
+      if ((i as number) - last === 2) {
+        rangeWithDots.push(last + 1);
+      } else if ((i as number) - last > 2) {
+        rangeWithDots.push("...");
+      }
+    }
+    rangeWithDots.push(i);
+    last = i as number;
+  }
+
+  return rangeWithDots;
 }

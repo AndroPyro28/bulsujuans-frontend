@@ -11,18 +11,12 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import { Complaint } from "@/types";
+import { ComplaintStatus, getComplaintStatusClass } from "@/lib/constants/status";
 
 const DATE_FORMAT = `MMM d yyyy`;
 
-export const columns: ColumnDef<{
-  id: string;
-  status: string;
-  victimName: string;
-  email: string;
-  contactNo: string;
-  description: string;
-  createdAt: string | Date;
-}>[] = [
+export const columns: ColumnDef<Complaint>[] = [
   {
     accessorKey: "id",
     header: () => {
@@ -30,15 +24,13 @@ export const columns: ColumnDef<{
     },
     cell: ({ row }) => {
       const id = row.getValue("id") as string;
-
       return <div className="sr-only dark:text-white">{id}</div>;
     },
   },
   {
-    accessorKey: "victimName",
+    accessorKey: "name",
     accessorFn: (row) => {
-      const description = row.description || {};
-      return description;
+      return row.name;
     },
     header: ({ column }) => (
       <div
@@ -49,8 +41,7 @@ export const columns: ColumnDef<{
       </div>
     ),
     cell: ({ row }) => {
-      // const {firstname, middlename, lastname} = row.original.profile
-      const victimName = row.original.victimName;
+      const victimName = `${row.original.name}`;
       return <div className={`flex items-center`}>{victimName}</div>;
     },
   },
@@ -75,9 +66,9 @@ export const columns: ColumnDef<{
   },
 
   {
-    accessorKey: "contactNo",
+    accessorKey: "contact_number",
     accessorFn: (row) => {
-      const contactNo = row.contactNo || {};
+      const contactNo = row.contact_number;
       return contactNo;
     },
     header: ({ column }) => (
@@ -89,14 +80,14 @@ export const columns: ColumnDef<{
       </div>
     ),
     cell: ({ row }) => {
-      const contactNo = row.original.contactNo;
+      const contactNo = row.original.contact_number;
       return <div className={`flex items-center`}>{contactNo}</div>;
     },
   },
   {
-    accessorKey: "description",
+    accessorKey: "incident_detail",
     accessorFn: (row) => {
-      const description = row.description || {};
+      const description = row.incident_detail || {};
       return description;
     },
     header: ({ column }) => (
@@ -108,14 +99,14 @@ export const columns: ColumnDef<{
       </div>
     ),
     cell: ({ row }) => {
-      const description = row.original.description;
+      const description = row.original.incident_detail;
       return <p className={`  w-40 line-clamp-2`}>{description}</p>;
     },
   },
   {
-    accessorKey: "status",
+    accessorKey: "complaint_status",
     accessorFn: (row) => {
-      const status = row.status;
+      const status = row.complaint_status;
       return status;
     },
     header: ({ column }) => (
@@ -127,23 +118,10 @@ export const columns: ColumnDef<{
       </div>
     ),
     cell: ({ row }) => {
-      // const yearEnrolled = row.getValue('') as Date
-      const status = row.original.status as string;
-
+      const status = row.original.complaint_status as string;
       return (
         <div className={``}>
-          <Badge
-            className={cn(
-              "dark:text-white bg-slate-500",
-              status === "PENDING" && "bg-slate-500",
-              (status === "REJECTED" || status === "CANCELLED") &&
-                "bg-rose-700",
-              status === "ACCEPTED" && "bg-[#107736]",
-              status === "COMPLETED" && "bg-[#16A34A]"
-            )}
-          >
-            {status}
-          </Badge>{" "}
+          <Badge className={getComplaintStatusClass(status)}>{status}</Badge>
         </div>
       );
     },
@@ -167,11 +145,7 @@ export const columns: ColumnDef<{
     },
     cell: ({ row }) => {
       const createdAt = row.original?.createdAt;
-      return (
-        <div className="">
-          {format(new Date(createdAt || new Date()), DATE_FORMAT)}
-        </div>
-      );
+      return <div className="">{format(new Date(createdAt || new Date()), DATE_FORMAT)}</div>;
     },
   },
 ];

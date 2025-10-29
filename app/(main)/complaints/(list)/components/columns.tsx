@@ -11,12 +11,11 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
-import { Complaint } from "@/types";
-import { ComplaintStatus, getComplaintStatusClass } from "@/lib/constants/status";
+import { TComplaintSchema, TStoreComplaintSchema } from "@/schema/complaints";
 
 const DATE_FORMAT = `MMM d yyyy`;
 
-export const columns: ColumnDef<Complaint>[] = [
+export const columns: ColumnDef<TComplaintSchema>[] = [
   {
     accessorKey: "id",
     header: () => {
@@ -24,13 +23,15 @@ export const columns: ColumnDef<Complaint>[] = [
     },
     cell: ({ row }) => {
       const id = row.getValue("id") as string;
+
       return <div className="sr-only dark:text-white">{id}</div>;
     },
   },
   {
     accessorKey: "name",
     accessorFn: (row) => {
-      return row.name;
+      const description = row.name || {};
+      return description;
     },
     header: ({ column }) => (
       <div
@@ -41,7 +42,7 @@ export const columns: ColumnDef<Complaint>[] = [
       </div>
     ),
     cell: ({ row }) => {
-      const victimName = `${row.original.name}`;
+      const victimName = row.original.name;
       return <div className={`flex items-center`}>{victimName}</div>;
     },
   },
@@ -68,7 +69,7 @@ export const columns: ColumnDef<Complaint>[] = [
   {
     accessorKey: "contact_number",
     accessorFn: (row) => {
-      const contactNo = row.contact_number;
+      const contactNo = row.contact_number || {};
       return contactNo;
     },
     header: ({ column }) => (
@@ -95,7 +96,7 @@ export const columns: ColumnDef<Complaint>[] = [
         className="text-[#181a19]  flex items-center cursor-pointer dark:text-white flex-1"
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
-        Description <ArrowUpDown className="ml-2 h-4 w-4" />
+        Incident Detail <ArrowUpDown className="ml-2 h-4 w-4" />
       </div>
     ),
     cell: ({ row }) => {
@@ -104,9 +105,9 @@ export const columns: ColumnDef<Complaint>[] = [
     },
   },
   {
-    accessorKey: "complaint_status",
+    accessorKey: "status",
     accessorFn: (row) => {
-      const status = row.complaint_status;
+      const status = row;
       return status;
     },
     header: ({ column }) => (
@@ -118,10 +119,21 @@ export const columns: ColumnDef<Complaint>[] = [
       </div>
     ),
     cell: ({ row }) => {
-      const status = row.original.complaint_status as string;
+      const status = row.original.complaint_status;
       return (
         <div className={``}>
-          <Badge className={getComplaintStatusClass(status)}>{status}</Badge>
+          <Badge
+            className={cn(
+              "dark:text-white bg-slate-500",
+              status === "PENDING" && "bg-slate-500",
+              (status === "REJECTED" || status === "CANCELLED") &&
+                "bg-rose-700",
+              status === "ACCEPTED" && "bg-[#107736]",
+              status === "COMPLETED" && "bg-[#16A34A]"
+            )}
+          >
+            {status}
+          </Badge>{" "}
         </div>
       );
     },
@@ -129,7 +141,7 @@ export const columns: ColumnDef<Complaint>[] = [
   {
     accessorKey: "createdAt",
     accessorFn: (row) => {
-      const createdAt = row.createdAt;
+      const createdAt = row.date_of_incident;
       return createdAt;
     },
     header: ({ column }) => {
@@ -138,14 +150,18 @@ export const columns: ColumnDef<Complaint>[] = [
           className=" text-[#181a19]  flex items-center cursor-pointer dark:text-white flex-1"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Date Created
+          Date of Incident
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </div>
       );
     },
     cell: ({ row }) => {
-      const createdAt = row.original?.createdAt;
-      return <div className="">{format(new Date(createdAt || new Date()), DATE_FORMAT)}</div>;
+      const dateOfIncident = row.original?.date_of_incident;
+      return (
+        <div className="">
+          {format(new Date(dateOfIncident || new Date()), DATE_FORMAT)}
+        </div>
+      );
     },
   },
 ];

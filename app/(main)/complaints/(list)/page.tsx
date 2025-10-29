@@ -35,7 +35,7 @@ const Complaints = () => {
   });
 
   return (
-    <div className="flex flex-col p-10">
+    <div className="w-full h-full p-10">
       <div className="flex flex-col gap-4">
         <div className="page-title">
           <h1 className="text-2xl font-semibold">My complaints</h1>

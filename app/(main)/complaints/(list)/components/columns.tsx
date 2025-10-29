@@ -127,8 +127,7 @@ export const columns: ColumnDef<Complaint>[] = [
             className={cn(
               "dark:text-white bg-slate-500",
               status === "PENDING" && "bg-slate-500",
-              (status === "REJECTED" || status === "CANCELLED") &&
-                "bg-rose-700",
+              (status === "REJECTED" || status === "CANCELLED") && "bg-rose-700",
               status === "ACCEPTED" && "bg-[#107736]",
               status === "COMPLETED" && "bg-[#16A34A]"
             )}
@@ -158,11 +157,7 @@ export const columns: ColumnDef<Complaint>[] = [
     },
     cell: ({ row }) => {
       const dateOfIncident = row.original?.date_of_incident;
-      return (
-        <div className="">
-          {format(new Date(dateOfIncident || new Date()), DATE_FORMAT)}
-        </div>
-      );
+      return <div className="">{format(new Date(dateOfIncident || new Date()), DATE_FORMAT)}</div>;
     },
   },
 ];

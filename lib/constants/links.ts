@@ -39,12 +39,7 @@ export const generaLinks: MenuLinkType[] = [
     icon: Tickets,
     access: Permission.TICKETS_VIEW_LIST,
   },
-  {
-    title: "My Complaints",
-    url: "/complaints",
-    icon: Tickets,
-    access: Permission.COMPLAINT_VIEW_LIST,
-  },
+
   {
     title: "Users",
     url: "/users",
@@ -56,14 +51,14 @@ export const generaLinks: MenuLinkType[] = [
 export const forYouLinks: MenuLinkType[] = [
   {
     title: "Profile",
-    url: "/dashboard/profile",
+    url: "/profile",
     icon: UserCog,
     access: Permission.PROFILE_VIEW_PROFILE,
   },
   {
-    title: "Test",
-    url: "/dashboard/test",
-    icon: LayoutDashboard,
-    access: Permission.PROFILE_VIEW_PROFILE,
+    title: "My Complaints",
+    url: "/complaints",
+    icon: Tickets,
+    access: Permission.COMPLAINT_VIEW_LIST,
   },
 ];

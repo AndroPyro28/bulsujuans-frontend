@@ -11,18 +11,11 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
+import { TComplaintSchema, TStoreComplaintSchema } from "@/schema/complaints";
 
 const DATE_FORMAT = `MMM d yyyy`;
 
-export const columns: ColumnDef<{
-  id: string;
-  status: string;
-  victimName: string;
-  email: string;
-  contactNo: string;
-  description: string;
-  createdAt: string | Date;
-}>[] = [
+export const columns: ColumnDef<TComplaintSchema>[] = [
   {
     accessorKey: "id",
     header: () => {
@@ -35,9 +28,9 @@ export const columns: ColumnDef<{
     },
   },
   {
-    accessorKey: "victimName",
+    accessorKey: "name",
     accessorFn: (row) => {
-      const description = row.description || {};
+      const description = row.name || {};
       return description;
     },
     header: ({ column }) => (
@@ -49,8 +42,7 @@ export const columns: ColumnDef<{
       </div>
     ),
     cell: ({ row }) => {
-      // const {firstname, middlename, lastname} = row.original.profile
-      const victimName = row.original.victimName;
+      const victimName = row.original.name;
       return <div className={`flex items-center`}>{victimName}</div>;
     },
   },
@@ -75,9 +67,9 @@ export const columns: ColumnDef<{
   },
 
   {
-    accessorKey: "contactNo",
+    accessorKey: "contact_number",
     accessorFn: (row) => {
-      const contactNo = row.contactNo || {};
+      const contactNo = row.contact_number || {};
       return contactNo;
     },
     header: ({ column }) => (
@@ -89,14 +81,14 @@ export const columns: ColumnDef<{
       </div>
     ),
     cell: ({ row }) => {
-      const contactNo = row.original.contactNo;
+      const contactNo = row.original.contact_number;
       return <div className={`flex items-center`}>{contactNo}</div>;
     },
   },
   {
-    accessorKey: "description",
+    accessorKey: "incident_detail",
     accessorFn: (row) => {
-      const description = row.description || {};
+      const description = row.incident_detail || {};
       return description;
     },
     header: ({ column }) => (
@@ -104,18 +96,18 @@ export const columns: ColumnDef<{
         className="text-[#181a19]  flex items-center cursor-pointer dark:text-white flex-1"
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
-        Description <ArrowUpDown className="ml-2 h-4 w-4" />
+        Incident Detail <ArrowUpDown className="ml-2 h-4 w-4" />
       </div>
     ),
     cell: ({ row }) => {
-      const description = row.original.description;
+      const description = row.original.incident_detail;
       return <p className={`  w-40 line-clamp-2`}>{description}</p>;
     },
   },
   {
     accessorKey: "status",
     accessorFn: (row) => {
-      const status = row.status;
+      const status = row;
       return status;
     },
     header: ({ column }) => (
@@ -127,9 +119,7 @@ export const columns: ColumnDef<{
       </div>
     ),
     cell: ({ row }) => {
-      // const yearEnrolled = row.getValue('') as Date
-      const status = row.original.status as string;
-
+      const status = row.original.complaint_status;
       return (
         <div className={``}>
           <Badge
@@ -151,7 +141,7 @@ export const columns: ColumnDef<{
   {
     accessorKey: "createdAt",
     accessorFn: (row) => {
-      const createdAt = row.createdAt;
+      const createdAt = row.date_of_incident;
       return createdAt;
     },
     header: ({ column }) => {
@@ -160,16 +150,16 @@ export const columns: ColumnDef<{
           className=" text-[#181a19]  flex items-center cursor-pointer dark:text-white flex-1"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Date Created
+          Date of Incident
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </div>
       );
     },
     cell: ({ row }) => {
-      const createdAt = row.original?.createdAt;
+      const dateOfIncident = row.original?.date_of_incident;
       return (
         <div className="">
-          {format(new Date(createdAt || new Date()), DATE_FORMAT)}
+          {format(new Date(dateOfIncident || new Date()), DATE_FORMAT)}
         </div>
       );
     },

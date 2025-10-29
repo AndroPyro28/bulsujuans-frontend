@@ -1,9 +1,13 @@
-'use client'
+"use client";
 import { DataTable } from "@/components/data-table";
 import React from "react";
 import { columns } from "./columns";
 import { useQueryProcessor } from "@/hooks/useTanstackQuery";
-import { storeComplaintSchema, TComplaintSchema, TStoreComplaintSchema } from "@/schema/complaints";
+import {
+  storeComplaintSchema,
+  TComplaintSchema,
+  TStoreComplaintSchema,
+} from "@/schema/complaints";
 import { Loader2 } from "lucide-react";
 import { Complaint, Pagination } from "@/types";
 export type ComplainsListProps = {
@@ -12,25 +16,19 @@ export type ComplainsListProps = {
   currentPage: number;
 };
 
-export const ComplainsList = ({ data, pagination, currentPage }: ComplainsListProps) => {
-    
-    const {data: complaints, status} = useQueryProcessor<{data: TComplaintSchema[]}>({
-    url: '/complaints/list',
-    key: ['complaints'],
-  })
-
-  
-  if(status == 'pending') {
-    return <Loader2 />
-  }
-
-  if(status === 'error') {
-    return null
-  }
-    
+export const ComplainsList = ({
+  data,
+  pagination,
+  currentPage,
+}: ComplainsListProps) => {
   return (
     <div>
-      <DataTable columns={columns} data={data} pageCount={pagination?.totalPages ?? 1} currentPage={currentPage} />
-</div>
-)
-}
+      <DataTable
+        columns={columns}
+        data={data}
+        pageCount={pagination?.totalPages ?? 1}
+        currentPage={currentPage}
+      />
+    </div>
+  );
+};

@@ -12,10 +12,11 @@ import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { TComplaintSchema, TStoreComplaintSchema } from "@/schema/complaints";
+import { Complaint } from "@/types";
 
 const DATE_FORMAT = `MMM d yyyy`;
 
-export const columns: ColumnDef<TComplaintSchema>[] = [
+export const columns: ColumnDef<Complaint>[] = [
   {
     accessorKey: "id",
     header: () => {

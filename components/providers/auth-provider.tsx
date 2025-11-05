@@ -1,6 +1,7 @@
 "use client";
 
 import { apiClient } from "@/hooks/useTanstackQuery";
+import { useRouter } from "next/navigation";
 import { createContext, useEffect, useState } from "react";
 
 export interface AuthUser {
@@ -12,6 +13,7 @@ export interface AuthUser {
 }
 
 type AuthContextType = {
+  isLoading: boolean;
   isAuthenticated: boolean;
   user?: AuthUser | null;
   hasRole: (role: string) => boolean;
@@ -20,11 +22,16 @@ type AuthContextType = {
   hasPermission: (permission: string) => boolean;
   hasAnyPermission: (permissions: string[]) => boolean;
   hasAllPermissions: (permissions: string[]) => boolean;
-  login: (authUser: AuthUser, access_token: string, refresh_token: string) => void;
+  login: (
+    authUser: AuthUser,
+    access_token: string,
+    refresh_token: string
+  ) => void;
   logout: () => void;
 };
 
 export const AuthContext = createContext<AuthContextType>({
+  isLoading: false,
   isAuthenticated: false,
   user: null,
   hasRole: () => false,
@@ -49,30 +56,62 @@ const authRoutePatterns = [
   /^\/complaints(\/.*)?$/,
 ];
 
+const loginRoutePatterns = [/^\/$/];
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [isloading, setIsLoading] = useState<boolean>(false);
-
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const router = useRouter();
   useEffect(() => {
     const fetchUser = async () => {
       const pathname = window.location.pathname;
       const refreshToken = localStorage.getItem("refresh-token");
+      // if (
+      //   !isAuthenticated &&
+      //   refreshToken &&
+      //   authRoutePatterns.some((pattern) => pattern.test(pathname))
+      // ) {
+      //   try {
+      //     setIsLoading(true);
+      //     console.log("TOKEN REFRESH");
+      //     const res = await apiClient.post("/auth/refresh", { refreshToken });
 
-      if (!isAuthenticated && refreshToken && authRoutePatterns.some((pattern) => pattern.test(pathname))) {
-        try {
-          setIsLoading(true);
-          console.log("TOKEN REFRESH");
-          const res = await apiClient.post("/auth/refresh", { refreshToken });
-
-          if (res.data) {
-            await login(res.data.auth, res.data.tokens.accessToken, res.data.tokens.refreshToken);
-          }
-          setIsLoading(false);
-        } catch (error) {
-          setIsLoading(false);
-          logout();
+      //     if (res.data) {
+      //       await login(
+      //         res.data.auth,
+      //         res.data.tokens.accessToken,
+      //         res.data.tokens.refreshToken
+      //       );
+      //     }
+      //     setIsLoading(false);
+      //   } catch (error) {
+      //     setIsLoading(false);
+      //     logout();
+      //   }
+      // }
+      try {
+        setIsLoading(true);
+        await apiClient.get("/auth/get-me", {
+          headers: {
+            Authorization: refreshToken,
+          },
+        });
+        const refresh = await apiClient.post("/auth/refresh", { refreshToken });
+        if (refresh.data) {
+          await login(
+            refresh.data.auth,
+            refresh.data.tokens.accessToken,
+            refresh.data.tokens.refreshToken
+          );
         }
+      } catch (error) {
+        if (authRoutePatterns.some((pattern) => pattern.test(pathname))) {
+          logout();
+          router.replace("/");
+        }
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -80,14 +119,22 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const hasRole = (role: string) => user?.role.includes(role) ?? false;
-  const hasAnyRole = (roles: string[]) => roles.some((r) => user?.role.includes(r)) ?? false;
-  const hasAllRoles = (roles: string[]) => roles.every((r) => user?.role.includes(r)) ?? false;
-  const hasPermission = (permission: string) => user?.permissions?.includes(permission) ?? false;
-  const hasAnyPermission = (permissions: string[]) => permissions.some((p) => user?.permissions?.includes(p)) ?? false;
+  const hasAnyRole = (roles: string[]) =>
+    roles.some((r) => user?.role.includes(r)) ?? false;
+  const hasAllRoles = (roles: string[]) =>
+    roles.every((r) => user?.role.includes(r)) ?? false;
+  const hasPermission = (permission: string) =>
+    user?.permissions?.includes(permission) ?? false;
+  const hasAnyPermission = (permissions: string[]) =>
+    permissions.some((p) => user?.permissions?.includes(p)) ?? false;
   const hasAllPermissions = (permissions: string[]) =>
     permissions.every((p) => user?.permissions?.includes(p)) ?? false;
 
-  const login = async (data: AuthUser, access_token: string, refresh_token: string) => {
+  const login = async (
+    data: AuthUser,
+    access_token: string,
+    refresh_token: string
+  ) => {
     setUser(data);
     setIsAuthenticated(true);
     localStorage.setItem("access-token", access_token);
@@ -102,13 +149,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     window.location.href = "/"; // redirect to home or login page
   };
 
-  // if (isloading) {
-  //   return <div>Loading...</div>;
-  // }
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <AuthContext.Provider
       value={{
+        isLoading,
         isAuthenticated,
         user,
         hasRole,

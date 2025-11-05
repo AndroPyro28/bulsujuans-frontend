@@ -6,7 +6,7 @@ interface FormInputProps<T extends FieldValues> {
   control: Control<T>;
   name: Path<T>;
   label: string;
-  type?: "number" | "text" | "email" | "password";
+  type?: "number" | "text" | "email" | "password" | "file";
   placeholder?: string;
 }
 

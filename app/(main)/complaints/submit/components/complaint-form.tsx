@@ -1,7 +1,7 @@
 "use client";
 import { Form } from "@/components/ui/form";
 import { NotepadText } from "lucide-react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { FormInput } from "@/components/form/form-input";
 import { FormSearch } from "@/components/form/form-search-input";
@@ -18,9 +18,22 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { CreateFormData } from "@/lib/utils";
 
 export const ComplaintForm = () => {
-  const isSubmitting = false; // || mutation.isPending || complaintOptionsQuery.isLoading
+  const addComplaint = useMutateProcessor<
+    TStoreComplaintSchema | FormData,
+    unknown
+  >({
+    url: "/complaints/store",
+    key: ["complaints"],
+    method: "POST",
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  const isSubmitting = addComplaint.status === "pending"; // || mutation.isPending || complaintOptionsQuery.isLoading
 
   const form = useForm({
     defaultValues: {
@@ -38,38 +51,40 @@ export const ComplaintForm = () => {
     disabled: isSubmitting,
   });
 
-  const addComplaint = useMutateProcessor<TStoreComplaintSchema, unknown>({
-    url: "/complaints/store",
-    key: ["complaints"],
-    method: "POST",
-  });
-
   const router = useRouter();
 
   const { user } = useAuth();
 
   const isDisabled = form.formState.disabled;
-
+  const [files, setFiles] = useState<File[]>([]);
+  const [previews, setPreviews] = useState<string[]>([]);
   const onSubmit = (data: any) => {
-    console.log("Submitted:", data);
-    addComplaint.mutate(
-      {
-        name: data.victimName,
-        email: data.email,
-        contact_number: data.contactNo.toString(),
-        alternate_contact_number: data.alternateMobileNo.toString(),
-        incident_detail: data.incidentDetails,
-        complaint_type: data.typeOfComplaint,
-        date_of_incident: data.dateAndTime,
-        complainant_id: user?.id as string,
+    const payload: TStoreComplaintSchema & { documents: File[] } = {
+      name: data.victimName,
+      email: data.email,
+      contact_number: data.contactNo.toString(),
+      alternate_contact_number: data.alternateMobileNo.toString(),
+      incident_detail: data.incidentDetails,
+      complaint_type: data.typeOfComplaint,
+      date_of_incident: data.dateAndTime,
+      complainant_id: user?.id as string,
+      documents: files,
+    };
+
+    const formData = CreateFormData<TStoreComplaintSchema>(payload);
+
+    addComplaint.mutate(formData, {
+      onSuccess(data, variables, onMutateResult, context) {
+        toast.success("Complaints submitted", {});
+        router.push("/complaints");
       },
-      {
-        onSuccess(data, variables, onMutateResult, context) {
-          toast.success("Complaints submitted", {});
-          router.push("/complaints");
-        },
-      }
-    );
+    });
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = Array.from(e.target.files || []);
+    setFiles(selected);
+    setPreviews(selected.map((file) => URL.createObjectURL(file)));
   };
 
   return (
@@ -146,6 +161,48 @@ export const ComplaintForm = () => {
               placeholder=""
             />
 
+            <label
+              htmlFor="file"
+              className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-gray-300 rounded-xl cursor-pointer hover:bg-gray-100 transition"
+            >
+              <svg
+                className="w-10 h-10 text-gray-400"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3 15a4 4 0 014-4h10a4 4 0 014 4v6H3v-6zm3-4V5a4 4 0 014-4h4a4 4 0 014 4v6"
+                />
+              </svg>
+              <span className="text-gray-500 mt-2 text-sm">
+                Click or drag files to upload
+              </span>
+              <input
+                id="file"
+                type="file"
+                multiple
+                accept="image/*"
+                className="hidden"
+                onChange={handleFileChange}
+              />
+            </label>
+
+            {previews.length > 0 && (
+              <div className="grid grid-cols-3 gap-3 mt-3">
+                {previews.map((src, i) => (
+                  <img
+                    key={i}
+                    src={src}
+                    alt={`preview-${i}`}
+                    className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                  />
+                ))}
+              </div>
+            )}
             <FormCheckbox
               control={form.control}
               name="remainAnonymous"

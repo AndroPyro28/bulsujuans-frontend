@@ -22,3 +22,31 @@ export const handleImageCompression = async (file: File) => {
     console.log(error);
   }
 };
+
+export const CreateFormData = <TData extends Record<string, any>> (data: TData): TData | FormData => {
+  const formData = new FormData();
+
+  (Object.keys(data) as (keyof TData)[]).forEach((key) => {
+    const value = data[key];
+    if (value == null) return;
+
+    if (key === "documents") {
+      if (!Array.isArray(value)) {
+        throw new Error(`Expected "${String(key)}" to be an array of files`);
+      }
+
+      value.forEach((file: File) => {
+        if (!(file instanceof File)) {
+          throw new Error(`Each item in "${String(key)}" must be a File`);
+        }
+        formData.append("documents", file);
+      });
+    } else if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+      formData.append(String(key), String(value));
+    } else {
+      // For nested objects, enforce serialization
+      throw new Error(`Unsupported value type for key "${String(key)}"`);
+    }
+  });
+  return formData;
+}

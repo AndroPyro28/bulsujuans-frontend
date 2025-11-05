@@ -12,7 +12,7 @@ import { ChevronUp, User2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 
 const AppSidebarFooter = () => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   return (
     <SidebarFooter>
@@ -26,7 +26,7 @@ const AppSidebarFooter = () => {
               </SidebarMenuButton>
             </DropdownMenuTrigger>
             <DropdownMenuContent side="top" align="end" className="w-[--radix-popper-anchor-width]">
-              <DropdownMenuItem>
+              <DropdownMenuItem onClick={logout}>
                 <span>Sign out</span>
               </DropdownMenuItem>
             </DropdownMenuContent>

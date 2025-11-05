@@ -30,17 +30,21 @@ export default function NewsDetail({ news }: NewsDetailProps) {
       <div className="flex-1 overflow-y-auto">
         <div className="p-8">
           {/* Featured Image */}
-          <Card className="mb-8 overflow-hidden bg-muted h-96 relative">
-            <Image src={news.image || "/placeholder.svg"} alt={news.title} fill className="object-cover" />
+          <Card className="mb-8 overflow-hidden bg-muted relative w-fit p-0">
+            <Image src={news.image || "/placeholder.svg"} alt={news.title} width={800} height={600} />
           </Card>
 
           {/* Article Text */}
           <div className="prose prose-invert max-w-none">
-            <p className="text-lg text-foreground leading-relaxed mb-6">{news.content}</p>
-            <p className="text-base text-muted-foreground leading-relaxed">
+            {/* <p className="text-lg text-foreground leading-relaxed mb-6">{news.content}</p> */}
+            <div
+              className="text-xs text-foreground leading-relaxed mb-6"
+              dangerouslySetInnerHTML={{ __html: news.content }}
+            />
+            {/* <p className="text-base text-muted-foreground leading-relaxed">
               This story continues to develop as more information becomes available. Stay tuned for updates on this
               evolving situation.
-            </p>
+            </p> */}
           </div>
         </div>
       </div>

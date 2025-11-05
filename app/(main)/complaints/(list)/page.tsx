@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import { UserActions } from "./components/user-actions";
 import { ComplainsList } from "./components/complains-list";
 import { Complaint, Pagination } from "@/types";
@@ -15,7 +15,7 @@ export interface ComplaintQuery {
   pagination: Pagination;
 }
 
-const Complaints = () => {
+const ComplaintsContent = () => {
   const searchParams = useSearchParams();
   const { user } = useAuth();
 
@@ -49,5 +49,11 @@ const Complaints = () => {
     </div>
   );
 };
+
+const Complaints = () => (
+  <Suspense fallback={<div>Loading...</div>}>
+    <ComplaintsContent />
+  </Suspense>
+);
 
 export default Complaints;

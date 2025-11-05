@@ -66,7 +66,6 @@ const LoginForm = () => {
     },
     resolver: zodResolver(loginSchema),
     mode: "all",
-    disabled: isLoading
   });
   form.watch(["type"]);
 

@@ -1,8 +1,8 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 import imageCompression from "browser-image-compression";
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 export const handleImageCompression = async (file: File) => {
@@ -23,7 +23,7 @@ export const handleImageCompression = async (file: File) => {
   }
 };
 
-export const CreateFormData = <TData extends Record<string, any>> (data: TData): TData | FormData => {
+export const CreateFormData = <TData extends Record<string, any>>(data: TData): TData | FormData => {
   const formData = new FormData();
 
   (Object.keys(data) as (keyof TData)[]).forEach((key) => {
@@ -49,4 +49,13 @@ export const CreateFormData = <TData extends Record<string, any>> (data: TData):
     }
   });
   return formData;
+};
+
+import { format, parseISO } from "date-fns";
+
+export function formatDate(dateString: string | null): string {
+  if (!dateString) return "N/A";
+
+  const date = parseISO(dateString); // parse ISO string
+  return format(date, "MMM dd, yyyy"); // Example: "Jan 12, 2024"
 }

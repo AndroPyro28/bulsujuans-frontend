@@ -10,21 +10,14 @@ import { FormCheckbox } from "@/components/form/form-checkbox";
 import { FormDate } from "@/components/form/form-data";
 import { FormSubmitButton } from "@/components/form/form-submit-button";
 import { useMutateProcessor } from "@/hooks/useTanstackQuery";
-import {
-  complaintsOptions,
-  ComplaintType,
-  TStoreComplaintSchema,
-} from "@/schema/complaints";
+import { complaintsOptions, ComplaintType, TStoreComplaintSchema } from "@/schema/complaints";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { CreateFormData } from "@/lib/utils";
 
 export const ComplaintForm = () => {
-  const addComplaint = useMutateProcessor<
-    TStoreComplaintSchema | FormData,
-    unknown
-  >({
+  const addComplaint = useMutateProcessor<TStoreComplaintSchema | FormData, unknown>({
     url: "/complaints/store",
     key: ["complaints"],
     method: "POST",
@@ -58,6 +51,7 @@ export const ComplaintForm = () => {
   const isDisabled = form.formState.disabled;
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
+
   const onSubmit = (data: any) => {
     const payload: TStoreComplaintSchema & { documents: File[] } = {
       name: data.victimName,
@@ -90,25 +84,15 @@ export const ComplaintForm = () => {
   return (
     <div className="bg-white w-full rounded-2xl shadow-2xl p-5 overflow-y-auto">
       <div className="flex">
-        <NotepadText className="text-md font-light" />{" "}
-        <h1 className="text-md font-light"> Complain Form</h1>
+        <NotepadText className="text-md font-light" /> <h1 className="text-md font-light"> Complain Form</h1>
       </div>
 
       <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          autoComplete="off"
-          className="flex flex-col"
-        >
+        <form onSubmit={form.handleSubmit(onSubmit)} autoComplete="off" className="flex flex-col">
           <section className="victim-information my-10 space-y-5 p-2">
             <h2 className="font-bold">Victim Information</h2>
 
-            <FormInput
-              control={form.control}
-              name="victimName"
-              label="Victim Name"
-              placeholder="enter victim name"
-            />
+            <FormInput control={form.control} name="victimName" label="Victim Name" placeholder="enter victim name" />
 
             <FormInput
               type="number"
@@ -126,13 +110,7 @@ export const ComplaintForm = () => {
               placeholder="enter alternate mobile number"
             />
 
-            <FormInput
-              type="email"
-              control={form.control}
-              name="email"
-              label="Email"
-              placeholder="your email"
-            />
+            <FormInput type="email" control={form.control} name="email" label="Email" placeholder="your email" />
           </section>
 
           <section className="complaint-details my-10 space-y-5 p-2">
@@ -178,17 +156,8 @@ export const ComplaintForm = () => {
                   d="M3 15a4 4 0 014-4h10a4 4 0 014 4v6H3v-6zm3-4V5a4 4 0 014-4h4a4 4 0 014 4v6"
                 />
               </svg>
-              <span className="text-gray-500 mt-2 text-sm">
-                Click or drag files to upload
-              </span>
-              <input
-                id="file"
-                type="file"
-                multiple
-                accept="image/*"
-                className="hidden"
-                onChange={handleFileChange}
-              />
+              <span className="text-gray-500 mt-2 text-sm">Click or drag files to upload</span>
+              <input id="file" type="file" multiple accept="image/*" className="hidden" onChange={handleFileChange} />
             </label>
 
             {previews.length > 0 && (

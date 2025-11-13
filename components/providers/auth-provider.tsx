@@ -3,6 +3,7 @@
 import { apiClient } from "@/hooks/useTanstackQuery";
 import { useRouter } from "next/navigation";
 import { createContext, useEffect, useState } from "react";
+import { PageLoading } from "../page-loading";
 
 export interface AuthUser {
   id: string;
@@ -22,11 +23,7 @@ type AuthContextType = {
   hasPermission: (permission: string) => boolean;
   hasAnyPermission: (permissions: string[]) => boolean;
   hasAllPermissions: (permissions: string[]) => boolean;
-  login: (
-    authUser: AuthUser,
-    access_token: string,
-    refresh_token: string
-  ) => void;
+  login: (authUser: AuthUser, access_token: string, refresh_token: string) => void;
   logout: () => void;
 };
 
@@ -99,11 +96,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         });
         const refresh = await apiClient.post("/auth/refresh", { refreshToken });
         if (refresh.data) {
-          await login(
-            refresh.data.auth,
-            refresh.data.tokens.accessToken,
-            refresh.data.tokens.refreshToken
-          );
+          await login(refresh.data.auth, refresh.data.tokens.accessToken, refresh.data.tokens.refreshToken);
         }
       } catch (error) {
         if (authRoutePatterns.some((pattern) => pattern.test(pathname))) {
@@ -119,22 +112,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const hasRole = (role: string) => user?.role.includes(role) ?? false;
-  const hasAnyRole = (roles: string[]) =>
-    roles.some((r) => user?.role.includes(r)) ?? false;
-  const hasAllRoles = (roles: string[]) =>
-    roles.every((r) => user?.role.includes(r)) ?? false;
-  const hasPermission = (permission: string) =>
-    user?.permissions?.includes(permission) ?? false;
-  const hasAnyPermission = (permissions: string[]) =>
-    permissions.some((p) => user?.permissions?.includes(p)) ?? false;
+  const hasAnyRole = (roles: string[]) => roles.some((r) => user?.role.includes(r)) ?? false;
+  const hasAllRoles = (roles: string[]) => roles.every((r) => user?.role.includes(r)) ?? false;
+  const hasPermission = (permission: string) => user?.permissions?.includes(permission) ?? false;
+  const hasAnyPermission = (permissions: string[]) => permissions.some((p) => user?.permissions?.includes(p)) ?? false;
   const hasAllPermissions = (permissions: string[]) =>
     permissions.every((p) => user?.permissions?.includes(p)) ?? false;
 
-  const login = async (
-    data: AuthUser,
-    access_token: string,
-    refresh_token: string
-  ) => {
+  const login = async (data: AuthUser, access_token: string, refresh_token: string) => {
     setUser(data);
     setIsAuthenticated(true);
     localStorage.setItem("access-token", access_token);
@@ -150,7 +135,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <PageLoading />;
   }
 
   return (

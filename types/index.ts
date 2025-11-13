@@ -12,6 +12,18 @@ export interface Complaint {
   createdAt: string;
   updatedAt: string;
   deleted_at?: string;
+  // relation
+  documents: Documents[];
+}
+
+export interface Documents {
+  id: string;
+  public_url: string;
+  public_id: string;
+  complaint_id: string;
+  createdAt: string;
+  updatedAt: string;
+  deleted_at: string | null;
 }
 
 export interface Pagination {

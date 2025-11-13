@@ -1,10 +1,12 @@
 "use client";
-import { ArrowUpDown, MoreHorizontal } from "lucide-react";
+import { ArrowUpDown, Eye, MoreHorizontal, Trash2 } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
@@ -13,6 +15,7 @@ import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { TComplaintSchema, TStoreComplaintSchema } from "@/schema/complaints";
 import { Complaint } from "@/types";
+import Link from "next/link";
 
 const DATE_FORMAT = `MMM d yyyy`;
 
@@ -158,6 +161,40 @@ export const columns: ColumnDef<Complaint>[] = [
     cell: ({ row }) => {
       const dateOfIncident = row.original?.date_of_incident;
       return <div className="">{format(new Date(dateOfIncident || new Date()), DATE_FORMAT)}</div>;
+    },
+  },
+  {
+    id: "actions",
+    size: 50,
+    minSize: 50,
+    cell: ({ row }) => {
+      const data = row.original;
+
+      return (
+        <div className="flex justify-center items-center">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild className="bg-blue-500/30 text-slate-900 cursor-pointer">
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Open menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem className="flex items-center gap-2">
+                <Eye className="h-4 w-4 text-blue-500" />
+                <Link href={`/complaints/${data.id}`}>View details</Link>
+              </DropdownMenuItem>
+
+              <DropdownMenuSeparator />
+
+              <DropdownMenuItem className="flex items-center gap-2 text-red-600">
+                <Trash2 className="h-4 w-4 text-red-600" />
+                <span>Remove details</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      );
     },
   },
 ];

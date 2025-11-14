@@ -38,14 +38,6 @@ const Page = () => {
       <ComplaintDetailView complaint={complaint} />
     </div>
   );
-
-  // return (
-  //   <div>
-  //     <pre>
-  //       <code>{JSON.stringify(data?.data, null, 2)}</code>
-  //     </pre>
-  //   </div>
-  // );
 };
 
 export default Page;

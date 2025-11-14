@@ -14,6 +14,7 @@ export interface Complaint {
   deleted_at?: string;
   // relation
   documents: Documents[];
+  ticket: Tickets;
 }
 
 export interface Documents {
@@ -26,9 +27,23 @@ export interface Documents {
   deleted_at: string | null;
 }
 
+export interface Tickets {
+  id: string;
+  title: string;
+  description: string;
+  status: string;
+  complaint_id: string;
+  assigned_office_id: string | null;
+  createdAt: string;
+  updatedAt: string;
+  deleted_at: string | null;
+}
+
 export interface Pagination {
   total: number;
   page: number;
   limit: number;
   totalPages: number;
 }
+
+export type ColumnType = "PENDING" | "RESOLVED" | "REJECTED";

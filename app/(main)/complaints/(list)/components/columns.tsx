@@ -16,6 +16,7 @@ import { Badge } from "@/components/ui/badge";
 import { TComplaintSchema, TStoreComplaintSchema } from "@/schema/complaints";
 import { Complaint } from "@/types";
 import Link from "next/link";
+import { ticketStatusConfig } from "@/lib/constants/status";
 
 const DATE_FORMAT = `MMM d yyyy`;
 
@@ -123,20 +124,12 @@ export const columns: ColumnDef<Complaint>[] = [
       </div>
     ),
     cell: ({ row }) => {
-      const status = row.original.complaint_status;
+      const status = row.original.ticket.status as keyof typeof ticketStatusConfig;
+      const config = ticketStatusConfig[status] || ticketStatusConfig.PENDING;
+
       return (
         <div className={``}>
-          <Badge
-            className={cn(
-              "dark:text-white bg-slate-500",
-              status === "PENDING" && "bg-slate-500",
-              (status === "REJECTED" || status === "CANCELLED") && "bg-rose-700",
-              status === "ACCEPTED" && "bg-[#107736]",
-              status === "COMPLETED" && "bg-[#16A34A]"
-            )}
-          >
-            {status}
-          </Badge>{" "}
+          <Badge className={cn("dark:text-white bg-slate-500", config.color, config.badge)}>{config.label}</Badge>
         </div>
       );
     },

@@ -6,15 +6,15 @@ import { Badge } from "@/components/ui/badge";
 import { Mail, Phone, Calendar, AlertCircle, FileText, User, Clock, CheckCircle2, AlertTriangle } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { DocumentGallery } from "./document-gallery";
-import { ComplaintStatus, complaintStatusConfig } from "@/lib/constants/status";
+import { ticketStatusConfig } from "@/lib/constants/status";
 
 interface ComplaintDetailViewProps {
   complaint: Complaint;
 }
 
 export function ComplaintDetailView({ complaint }: ComplaintDetailViewProps) {
-  const status = complaint.complaint_status as keyof typeof complaintStatusConfig;
-  const config = complaintStatusConfig[status] || complaintStatusConfig.PENDING;
+  const status = complaint.ticket.status as keyof typeof ticketStatusConfig;
+  const config = ticketStatusConfig[status] || ticketStatusConfig.PENDING;
   const StatusIcon = config.icon;
 
   return (

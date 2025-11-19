@@ -1,9 +1,10 @@
 "use client";
 
 import { apiClient } from "@/hooks/useTanstackQuery";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { createContext, useEffect, useState } from "react";
 import { PageLoading } from "../page-loading";
+import { forYouLinks, generaLinks } from "@/lib/constants/links";
 
 export interface AuthUser {
   id: string;
@@ -41,75 +42,77 @@ export const AuthContext = createContext<AuthContextType>({
   logout: () => {},
 });
 
-const authRoutePatterns = [
-  /^\/dashboard(\/.*)?$/, // matches "/dashboard" and anything starting with "/dashboard/"
-  /^\/complain(\/.*)?$/,
-  /^\/emergency(\/.*)?$/,
-  /^\/news(\/.*)?$/,
-  /^\/profile(\/.*)?$/,
-  /^\/services(\/.*)?$/,
-  /^\/tickets(\/.*)?$/,
-  /^\/users(\/.*)?$/,
-  /^\/complaints(\/.*)?$/,
-];
-
-const loginRoutePatterns = [/^\/$/];
+const authorizedRoutePatterns = [...generaLinks, ...forYouLinks];
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const router = useRouter();
+  const pathname = usePathname();
+
+  // ----------------------------
+  // FETCH USER USING REFRESH-TOKEN
+  // ----------------------------
   useEffect(() => {
     const fetchUser = async () => {
-      const pathname = window.location.pathname;
       const refreshToken = localStorage.getItem("refresh-token");
-      // if (
-      //   !isAuthenticated &&
-      //   refreshToken &&
-      //   authRoutePatterns.some((pattern) => pattern.test(pathname))
-      // ) {
-      //   try {
-      //     setIsLoading(true);
-      //     console.log("TOKEN REFRESH");
-      //     const res = await apiClient.post("/auth/refresh", { refreshToken });
 
-      //     if (res.data) {
-      //       await login(
-      //         res.data.auth,
-      //         res.data.tokens.accessToken,
-      //         res.data.tokens.refreshToken
-      //       );
-      //     }
-      //     setIsLoading(false);
-      //   } catch (error) {
-      //     setIsLoading(false);
-      //     logout();
-      //   }
-      // }
-      try {
-        setIsLoading(true);
-        await apiClient.get("/auth/get-me", {
-          headers: {
-            Authorization: refreshToken,
-          },
-        });
-        const refresh = await apiClient.post("/auth/refresh", { refreshToken });
-        if (refresh.data) {
-          await login(refresh.data.auth, refresh.data.tokens.accessToken, refresh.data.tokens.refreshToken);
-        }
-      } catch (error) {
-        if (authRoutePatterns.some((pattern) => pattern.test(pathname))) {
-          logout();
-          router.replace("/");
-        }
-      } finally {
+      if (!refreshToken) {
         setIsLoading(false);
+        return;
+      }
+
+      try {
+        const res = await apiClient.post("/auth/refresh", {
+          refreshToken,
+        });
+
+        const data = res.data;
+
+        if (!data || !data.auth || !data.tokens?.accessToken || !data.tokens?.refreshToken) {
+          await logout();
+        } else {
+          await login(data.auth, data.tokens.accessToken, data.tokens.refreshToken);
+
+          /* if current pathname is existing in the authorizedRoutePatterns redirect it eslse redirect to profile */
+          const route = authorizedRoutePatterns.find((r) => pathname.startsWith(r.url));
+
+          if (route) {
+            router.replace(pathname);
+          } else {
+            router.replace("/profile");
+          }
+        }
+
+        setTimeout(() => {
+          setIsLoading(false);
+        }, 700);
+      } catch (error) {
+        logout();
       }
     };
 
     fetchUser();
   }, []);
+
+  // ---------------------------------
+  // ROUTE PROTECTION
+  // ---------------------------------
+  useEffect(() => {
+    if (isAuthenticated && pathname !== "/") {
+      // check route permissions
+      const route = authorizedRoutePatterns.find((r) => pathname.startsWith(r.url));
+
+      if (route) {
+        const requiredPermission = route.access;
+
+        if (!hasPermission(requiredPermission)) {
+          router.replace("/unauthorized");
+        }
+      }
+    }
+  }, [isLoading, isAuthenticated, pathname, user]);
 
   const hasRole = (role: string) => user?.role.includes(role) ?? false;
   const hasAnyRole = (roles: string[]) => roles.some((r) => user?.role.includes(r)) ?? false;
@@ -131,7 +134,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setIsAuthenticated(false);
     localStorage.removeItem("access-token");
     localStorage.removeItem("refresh-token");
-    window.location.href = "/"; // redirect to home or login page
+    router.push("/");
   };
 
   if (isLoading) {

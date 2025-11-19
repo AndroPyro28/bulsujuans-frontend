@@ -7,6 +7,7 @@ import { Complaint, Pagination } from "@/types";
 import { useQueryProcessor } from "@/hooks/useTanstackQuery";
 import { useAuth } from "@/hooks/useAuth";
 import { useSearchParams } from "next/navigation";
+import { PageLoading } from "@/components/page-loading";
 
 export interface ComplaintQuery {
   data: Complaint[];
@@ -15,7 +16,7 @@ export interface ComplaintQuery {
   pagination: Pagination;
 }
 
-const ComplaintsContent = () => {
+const ComplaintsClient = () => {
   const searchParams = useSearchParams();
   const { user } = useAuth();
 
@@ -50,10 +51,10 @@ const ComplaintsContent = () => {
   );
 };
 
-const Complaints = () => (
-  <Suspense fallback={<div>Loading...</div>}>
-    <ComplaintsContent />
+const Page = () => (
+  <Suspense fallback={<PageLoading />}>
+    <ComplaintsClient />
   </Suspense>
 );
 
-export default Complaints;
+export default Page;

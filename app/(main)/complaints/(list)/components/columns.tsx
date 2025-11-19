@@ -17,6 +17,7 @@ import { TComplaintSchema, TStoreComplaintSchema } from "@/schema/complaints";
 import { Complaint } from "@/types";
 import Link from "next/link";
 import { ticketStatusConfig } from "@/lib/constants/status";
+import { useAuth } from "@/hooks/useAuth";
 
 const DATE_FORMAT = `MMM d yyyy`;
 
@@ -162,6 +163,10 @@ export const columns: ColumnDef<Complaint>[] = [
     minSize: 50,
     cell: ({ row }) => {
       const data = row.original;
+      const auth = useAuth();
+
+      const canViewComplaintDetai = auth.hasPermission("complaint:view_detail");
+      const canDeleteComplaint = auth.hasPermission("complaint:delete");
 
       return (
         <div className="flex justify-center items-center">
@@ -173,14 +178,14 @@ export const columns: ColumnDef<Complaint>[] = [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem className="flex items-center gap-2">
+              <DropdownMenuItem className="flex items-center gap-2" disabled={!canViewComplaintDetai}>
                 <Eye className="h-4 w-4 text-blue-500" />
                 <Link href={`/complaints/${data.id}`}>View details</Link>
               </DropdownMenuItem>
 
               <DropdownMenuSeparator />
 
-              <DropdownMenuItem className="flex items-center gap-2 text-red-600">
+              <DropdownMenuItem className="flex items-center gap-2 text-red-600" disabled={!canDeleteComplaint}>
                 <Trash2 className="h-4 w-4 text-red-600" />
                 <span>Remove details</span>
               </DropdownMenuItem>

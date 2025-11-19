@@ -2,12 +2,12 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { UnderDevelopment } from "@/components/under-devellopment";
 import { AlertCircle, ArrowRight, CheckCircle2, Clock, Shield, Users, Zap } from "lucide-react";
 import React, { useState } from "react";
 
 const Page = () => {
   const [activePhase, setActivePhase] = useState(0);
+
   return (
     <div className="w-full h-full p-10">
       {/* Features Section */}

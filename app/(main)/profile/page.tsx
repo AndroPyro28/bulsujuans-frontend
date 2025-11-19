@@ -1,11 +1,11 @@
 "use client";
 
-import { UnderDevelopment } from "@/components/under-devellopment";
 import React, { useState } from "react";
 import ProfileHeader from "./components/profile-header";
 import ProfileInfo from "./components/profile-info";
 import { EducationSection } from "./components/education-section";
 import { ExperienceSection } from "./components/experience-section";
+import { useAuth } from "@/hooks/useAuth";
 
 const Page = () => {
   const [expandedSections, setExpandedSections] = useState<string[]>(["about"]);
@@ -13,6 +13,8 @@ const Page = () => {
   const toggleSection = (section: string) => {
     setExpandedSections((prev) => (prev.includes(section) ? prev.filter((s) => s !== section) : [...prev, section]));
   };
+
+  const auth = useAuth();
 
   return (
     <div className="w-full h-full p-10 space-y-10">
@@ -27,6 +29,9 @@ const Page = () => {
       <ExperienceSection items={experienceData} />
       <EducationSection items={educationData} />
 
+      <pre className="text-xs bg-slate-900 text-white rounded-md">
+        <code>{JSON.stringify(auth.user, null, 2)}</code>
+      </pre>
       {/* <AdditionalSections expandedSections={expandedSections} toggleSection={toggleSection} /> */}
     </div>
   );

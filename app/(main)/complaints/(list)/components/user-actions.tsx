@@ -5,6 +5,7 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { useDebouncedCallback } from "use-debounce";
 import { useSetQuery } from "@/hooks/use-set-query";
+import { useAuth } from "@/hooks/useAuth";
 
 export type UserActionsProps = {
   search: string;
@@ -12,11 +13,14 @@ export type UserActionsProps = {
 
 export const UserActions = ({ search }: UserActionsProps) => {
   const router = useRouter();
+  const auth = useAuth();
   const { setQuery } = useSetQuery();
 
   const debouncedSearch = useDebouncedCallback((value: string) => {
     setQuery({ search: value, page: 1 });
   }, 500);
+
+  const canCreateComplaint = auth.hasPermission("complaint:create");
 
   return (
     <div className="flex items-center justify-between">
@@ -33,6 +37,7 @@ export const UserActions = ({ search }: UserActionsProps) => {
         <Button
           variant={"default"}
           onClick={() => router.push("/complaints/submit")}
+          disabled={!canCreateComplaint}
           className="cursor-pointer font-light"
         >
           Create complain

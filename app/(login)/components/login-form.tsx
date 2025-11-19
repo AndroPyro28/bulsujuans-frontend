@@ -3,25 +3,9 @@ import { Input } from "@/components/ui/input";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Image from "next/image";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
-import {
-  ArrowBigLeft,
-  ArrowLeftCircle,
-  ChevronLeft,
-  Loader2,
-} from "lucide-react";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
+import { ArrowBigLeft, ArrowLeftCircle, ChevronLeft, Loader2 } from "lucide-react";
 import logo from "@/public/assets/app-logo.png";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
@@ -35,14 +19,13 @@ import { useEffect } from "react";
 const LoginForm = () => {
   const auth = useAuth();
 
-  useEffect(() => {
-    if (auth.isAuthenticated) {
-      router.push("/services");
-    }
-  }, [auth.isAuthenticated]);
+  // useEffect(() => {
+  //   if (auth.isAuthenticated) {
+  //     router.push("/services");
+  //   }
+  // }, [auth.isAuthenticated]);
 
   const router = useRouter();
-
 
   type TLoginResponse = {
     tokens: {
@@ -56,8 +39,8 @@ const LoginForm = () => {
     key: ["auth-login"],
     method: "POST",
   });
-  
-  const isLoading =  login.status === 'pending';
+
+  const isLoading = login.status === "pending";
 
   const form = useForm({
     defaultValues: {
@@ -116,20 +99,10 @@ const LoginForm = () => {
               toast.success("Login successful", {
                 style: successStyle,
               });
-              window.localStorage.setItem(
-                "access-token",
-                data.tokens.accessToken
-              );
-              window.localStorage.setItem(
-                "refresh-token",
-                data.tokens.refreshToken
-              );
-              auth.login(
-                data.auth,
-                data.tokens.accessToken,
-                data.tokens.refreshToken
-              );
-              window.location.assign("/dashboard");
+              window.localStorage.setItem("access-token", data.tokens.accessToken);
+              window.localStorage.setItem("refresh-token", data.tokens.refreshToken);
+              auth.login(data.auth, data.tokens.accessToken, data.tokens.refreshToken);
+              window.location.assign("/profile");
             },
             onError(error, variables, onMutateResult, context) {
               if (axios.isAxiosError(error)) {
@@ -169,17 +142,10 @@ const LoginForm = () => {
             return (
               <>
                 <div className="h-[150px] w-[150px] relative">
-                  <Image
-                    src={logo}
-                    className="object-contain"
-                    alt="logo"
-                    fill
-                  />
+                  <Image src={logo} className="object-contain" alt="logo" fill />
                 </div>
 
-                <h1 className=" text-3xl text-zinc-700 text-center mx-10 mt-5 ">
-                  Sign in with email
-                </h1>
+                <h1 className=" text-3xl text-zinc-700 text-center mx-10 mt-5 ">Sign in with email</h1>
 
                 <p className="text-md text-muted-foreground mt-1 text-center">
                   Empowering students, one tap at a time.
@@ -219,17 +185,10 @@ const LoginForm = () => {
                   onClick={handleCancel}
                 />
                 <div className="h-[150px] w-[150px] relative">
-                  <Image
-                    src={logo}
-                    className="object-contain"
-                    alt="logo"
-                    fill
-                  />
+                  <Image src={logo} className="object-contain" alt="logo" fill />
                 </div>
 
-                <h1 className=" text-3xl text-zinc-700 text-center mx-10 mt-5 ">
-                  Verify your email
-                </h1>
+                <h1 className=" text-3xl text-zinc-700 text-center mx-10 mt-5 ">Verify your email</h1>
 
                 <p className="text-md text-muted-foreground mt-1 text-center">
                   Please enter the one-time password sent to your email.
@@ -241,42 +200,19 @@ const LoginForm = () => {
                     name="otp"
                     key={"otp"}
                     render={({ field }) => {
-                      const otpSlotClassname =
-                        "border-[#cf8f82] border-2 rounded-md";
+                      const otpSlotClassname = "border-[#cf8f82] border-2 rounded-md";
                       return (
                         <FormItem className="w-full flex justify-center">
                           <FormLabel className="uppercase text-md font-bold text-black dark:text-secondary/70"></FormLabel>
                           <FormControl>
-                            <InputOTP
-                              maxLength={6}
-                              {...field}
-                              className="border-black"
-                            >
+                            <InputOTP maxLength={6} {...field} className="border-black">
                               <InputOTPGroup className="flex space-x-5 border-0 ">
-                                <InputOTPSlot
-                                  index={0}
-                                  className={otpSlotClassname}
-                                />
-                                <InputOTPSlot
-                                  index={1}
-                                  className={otpSlotClassname}
-                                />
-                                <InputOTPSlot
-                                  index={2}
-                                  className={otpSlotClassname}
-                                />
-                                <InputOTPSlot
-                                  index={3}
-                                  className={otpSlotClassname}
-                                />
-                                <InputOTPSlot
-                                  index={4}
-                                  className={otpSlotClassname}
-                                />
-                                <InputOTPSlot
-                                  index={5}
-                                  className={otpSlotClassname}
-                                />
+                                <InputOTPSlot index={0} className={otpSlotClassname} />
+                                <InputOTPSlot index={1} className={otpSlotClassname} />
+                                <InputOTPSlot index={2} className={otpSlotClassname} />
+                                <InputOTPSlot index={3} className={otpSlotClassname} />
+                                <InputOTPSlot index={4} className={otpSlotClassname} />
+                                <InputOTPSlot index={5} className={otpSlotClassname} />
                               </InputOTPGroup>
                             </InputOTP>
                           </FormControl>

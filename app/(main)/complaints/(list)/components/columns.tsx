@@ -16,8 +16,8 @@ import { Badge } from "@/components/ui/badge";
 import { TComplaintSchema, TStoreComplaintSchema } from "@/schema/complaints";
 import { Complaint } from "@/types";
 import Link from "next/link";
-import { ticketStatusConfig } from "@/lib/constants/status";
 import { useAuth } from "@/hooks/useAuth";
+import { ticketStatusConfig } from "@/app/(main)/tickets/constants/type";
 
 const DATE_FORMAT = `MMM d yyyy`;
 

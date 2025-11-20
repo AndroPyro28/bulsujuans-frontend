@@ -46,4 +46,3 @@ export interface Pagination {
   totalPages: number;
 }
 
-export type ColumnType = "PENDING" | "RESOLVED" | "REJECTED";

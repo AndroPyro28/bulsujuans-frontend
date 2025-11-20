@@ -11,13 +11,13 @@ import {
   DragEndEvent,
   DragStartEvent,
 } from "@dnd-kit/core";
-import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
+import { sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { ReactNode, useState, useCallback, useMemo } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchTickets, updateTicketStatus } from "@/lib/api";
-import { ColumnType, Pagination, Tickets } from "@/types";
+import { useQueryClient } from "@tanstack/react-query";
+import { Pagination, Tickets } from "@/types";
 import { KanbanCard } from "./kanban-card";
 import { useMutateProcessor, useQueryProcessor } from "@/hooks/useTanstackQuery";
+import { ColumnType } from "../constants/type";
 
 export interface TicketsQuery {
   data: Tickets[];
@@ -34,11 +34,6 @@ export function DndProvider({ children }: DndProviderProps) {
   const [idToUpdate, SetIdToUpdate] = useState<string | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const queryClient = useQueryClient();
-
-  // const { data: tickets = [] } = useQuery<Tickets[]>({
-  //   queryKey: ["tickets"],
-  //   queryFn: fetchTickets,
-  // });
 
   const { data } = useQueryProcessor<TicketsQuery>({
     url: "/tickets/list",
@@ -63,15 +58,6 @@ export function DndProvider({ children }: DndProviderProps) {
     return tickets.find((t) => t.id === activeId);
   }, [activeId, tickets]);
 
-  // const updateMutation = useMutation({
-  //   mutationFn: ({ ticketId, status }: { ticketId: string; status: string }) => updateTicketStatus(ticketId, status),
-  //   onSuccess: () => {
-  //     queryClient.invalidateQueries({ queryKey: ["tickets"] });
-  //   },
-  // });
-
-  console.log(activeId);
-
   const updateMutation = useMutateProcessor<{ status: string }, unknown>({
     url: `/tickets/update/${idToUpdate}`,
     key: ["tickets"],
@@ -89,7 +75,14 @@ export function DndProvider({ children }: DndProviderProps) {
 
       if (!over) return;
 
-      const VALID_COLUMNS: ColumnType[] = ["PENDING", "RESOLVED", "REJECTED"];
+      const VALID_COLUMNS: ColumnType[] = [
+        "PENDING",
+        "RESOLVED",
+        "REJECTED",
+        "BEING_PROCESS",
+        "BEING_STUDIED",
+        "UNDER_REVIEW",
+      ];
 
       if (typeof over.id === "string" && VALID_COLUMNS.includes(over.id as ColumnType)) {
         const newStatus = over.id;

@@ -137,7 +137,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     router.push("/");
   };
 
-  if (isLoading) {
+  if (isLoading && pathname !== "/") {
     return <PageLoading />;
   }
 

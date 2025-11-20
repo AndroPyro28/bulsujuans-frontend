@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Mail, Phone, Calendar, AlertCircle, FileText, User, Clock, CheckCircle2, AlertTriangle } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { DocumentGallery } from "./document-gallery";
-import { ticketStatusConfig } from "@/lib/constants/status";
+import { ticketStatusConfig } from "@/app/(main)/tickets/constants/type";
 
 interface ComplaintDetailViewProps {
   complaint: Complaint;
@@ -26,9 +26,7 @@ export function ComplaintDetailView({ complaint }: ComplaintDetailViewProps) {
             <div className="space-y-3 flex-1">
               <div className="flex items-center gap-3">
                 <StatusIcon className="h-6 w-6" />
-                <h1 className="text-3xl font-bold text-foreground">
-                  Complaint #{complaint.id.slice(-8).toUpperCase()}
-                </h1>
+                <h1 className="text-3xl font-bold text-foreground">{complaint.ticket.title.slice(0, 30)}</h1>
               </div>
               <Badge className={config.badge}>{config.label}</Badge>
               <p className="text-sm text-muted-foreground">Created on {formatDate(complaint.createdAt)}</p>

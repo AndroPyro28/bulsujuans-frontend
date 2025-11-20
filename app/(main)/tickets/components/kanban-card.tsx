@@ -6,16 +6,13 @@ import { Card } from "@/components/ui/card";
 import { GripVertical, Calendar } from "lucide-react";
 import { Tickets } from "@/types";
 import { Button } from "@/components/ui/button";
+import { formatStatus } from "@/lib/utils";
+import Link from "next/link";
+import { ticketStatusConfig } from "../constants/type";
 
 interface KanbanCardProps {
   ticket: Tickets;
 }
-
-const STATUS_COLORS = {
-  PENDING: "bg-amber-500",
-  RESOLVED: "bg-emerald-500",
-  REJECTED: "bg-red-500",
-};
 
 export function KanbanCard({ ticket }: KanbanCardProps) {
   const {
@@ -66,17 +63,19 @@ export function KanbanCard({ ticket }: KanbanCardProps) {
 
           {/* Content */}
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-slate-900 dark:text-white text-sm mb-1 truncate">{ticket.title}</h3>
+            <h3 className="font-semibold text-slate-900 dark:text-white text-xs mb-1 truncate">
+              {ticket.title.slice(0, 30)}
+            </h3>
             <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 mb-3">{ticket.description}</p>
 
             {/* Footer */}
             <div className="flex items-center justify-between">
               <span
                 className={`text-xs font-medium px-2 py-1 rounded ${
-                  STATUS_COLORS[ticket.status as keyof typeof STATUS_COLORS]
+                  ticketStatusConfig[ticket.status as keyof typeof ticketStatusConfig].status_color
                 } text-white`}
               >
-                {ticket.status}
+                {formatStatus(ticket.status, "upper")}
               </span>
               <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
                 <Calendar className="h-3 w-3" />
@@ -86,10 +85,18 @@ export function KanbanCard({ ticket }: KanbanCardProps) {
 
             {/* ID Badge */}
             <div className="flex justify-end gap-2 mt-2 pt-2 border-t border-slate-200/50 dark:border-slate-700/50">
-              <Button variant={"outline"}>View</Button>
-              {(ticket.status === "RESOLVED" || ticket.status === "REJECTED") && (
-                <Button variant={"destructive"}>Archive</Button>
-              )}
+              <Button variant="outline" asChild className="text-xs">
+                <Link href={`/complaints/${ticket.complaint_id}`} target="_blank" rel="noopener noreferrer">
+                  View
+                </Link>
+              </Button>
+
+              {ticket.status === "REJECTED" ||
+                (ticket.status === "RESOLVED" && (
+                  <Button variant="destructive" size={"sm"} className="text-xs">
+                    Archive
+                  </Button>
+                ))}
             </div>
           </div>
         </div>

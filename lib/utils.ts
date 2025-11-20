@@ -59,3 +59,21 @@ export function formatDate(dateString: string | null): string {
   const date = parseISO(dateString); // parse ISO string
   return format(date, "MMM dd, yyyy"); // Example: "Jan 12, 2024"
 }
+
+type FormatCase = "lower" | "capitalized" | "upper";
+
+export function formatStatus(status: string, format: FormatCase = "capitalized") {
+  // Convert ENUM style (EX: BEING_PROCESS) → array of words
+  const words = status.split("_").map((word) => word.toLowerCase());
+
+  if (format === "lower") {
+    return words.join(" ");
+  }
+
+  if (format === "upper") {
+    return words.join(" ").toUpperCase();
+  }
+
+  // capitalized (default)
+  return words.map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(" ");
+}

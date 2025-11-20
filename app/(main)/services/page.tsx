@@ -5,8 +5,41 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle, ArrowRight, CheckCircle2, Clock, Shield, Users, Zap } from "lucide-react";
 import React, { useState } from "react";
 
+const phaseColorConfig: Record<string, { bg: string; label: string }> = {
+  PENDING: {
+    bg: "bg-amber-50 dark:bg-amber-950/30",
+    label: "text-amber-700 dark:text-amber-400",
+  },
+  UNDER_REVIEW: {
+    bg: "bg-blue-50 dark:bg-blue-950/30",
+    label: "text-blue-700 dark:text-blue-400",
+  },
+  BEING_STUDIED: {
+    bg: "bg-indigo-50 dark:bg-indigo-950/30",
+    label: "text-indigo-700 dark:text-indigo-400",
+  },
+  BEING_PROCESS: {
+    bg: "bg-purple-50 dark:bg-purple-950/30",
+    label: "text-purple-700 dark:text-purple-400",
+  },
+  RESOLVED: {
+    bg: "bg-emerald-50 dark:bg-emerald-950/30",
+    label: "text-emerald-700 dark:text-emerald-400",
+  },
+  REJECTED: {
+    bg: "bg-red-50 dark:bg-red-950/30",
+    label: "text-red-700 dark:text-red-400",
+  },
+};
+
 const Page = () => {
   const [activePhase, setActivePhase] = useState(0);
+
+  const activePhaseData = serviceData.phases[activePhase];
+  const phaseStyle = phaseColorConfig[activePhaseData.status] || {
+    bg: "bg-card/10",
+    label: "text-foreground",
+  };
 
   return (
     <div className="w-full h-full p-10">
@@ -65,27 +98,38 @@ const Page = () => {
             <h2 className="text-3xl font-bold">Monitoring Phases</h2>
             <p className="mt-4 text-muted-foreground">Track your grievance through each stage</p>
           </div>
+
+          {/* Phase Buttons */}
           <div className="grid gap-4 md:grid-cols-5">
-            {serviceData.phases.map((item, idx) => (
-              <button
-                key={idx}
-                onClick={() => setActivePhase(idx)}
-                className={`rounded-lg p-4 text-left transition-all ${
-                  activePhase === idx
-                    ? "bg-primary text-primary-foreground shadow-lg"
-                    : "bg-card/50 backdrop-blur hover:bg-card/70"
-                }`}
-              >
-                <p className="font-semibold">{item.phase}</p>
-                <p className="mt-2 text-sm opacity-90">{item.description}</p>
-              </button>
-            ))}
+            {serviceData.phases.map((item, idx) => {
+              const color = phaseColorConfig[item.status] || {
+                bg: "bg-card/10",
+                label: "text-foreground",
+              };
+
+              return (
+                <button
+                  key={idx}
+                  onClick={() => setActivePhase(idx)}
+                  className={`
+                  rounded-lg p-4 text-left transition-all
+                  ${
+                    activePhase === idx
+                      ? `${color.bg} shadow-lg border border-primary/20 ${color.label}`
+                      : "bg-card/50 backdrop-blur hover:bg-card/70"
+                  }
+                `}
+                >
+                  <p className="font-semibold">{item.phase}</p>
+                  <p className="mt-2 text-sm opacity-90">{item.description}</p>
+                </button>
+              );
+            })}
           </div>
-          <Card className="mt-8 border-0 bg-accent/10 backdrop-blur">
+
+          <Card className={`mt-8 backdrop-blur border rounded-xl transition-all ${phaseStyle.bg}`}>
             <CardContent className="pt-6">
-              <p className="text-center text-lg font-medium text-foreground">
-                {serviceData.phases[activePhase].description}
-              </p>
+              <p className={`text-center text-lg font-medium ${phaseStyle.label}`}>{activePhaseData.description}</p>
             </CardContent>
           </Card>
         </div>
@@ -145,6 +189,15 @@ const Page = () => {
 
 export default Page;
 
+// export const phaseColorConfig = {
+//   PENDING: "bg-amber-50 text-amber-700 dark:bg-amber-950/30 dark:text-amber-300",
+//   UNDER_REVIEW: "bg-blue-50 text-blue-700 dark:bg-blue-950/30 dark:text-blue-300",
+//   BEING_STUDIED: "bg-indigo-50 text-indigo-700 dark:bg-indigo-950/30 dark:text-indigo-300",
+//   BEING_PROCESS: "bg-purple-50 text-purple-700 dark:bg-purple-950/30 dark:text-purple-300",
+//   RESOLVED: "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/30 dark:text-emerald-300",
+//   REJECTED: "bg-red-50 text-red-700 dark:bg-red-950/30 dark:text-red-300",
+// };
+
 const serviceData = {
   about: {
     title: "About BULSUJUANS",
@@ -192,11 +245,15 @@ const serviceData = {
     },
   ],
   phases: [
-    { phase: "Phase 1", description: "The report has been submitted." },
-    { phase: "Phase 2", description: "The report is under review." },
-    { phase: "Phase 3", description: "The report is now being studied." },
-    { phase: "Phase 4", description: "The report is being processed by the concerned office or organization." },
-    { phase: "Phase 5", description: "The issue has been resolved." },
+    { phase: "Phase 1", description: "The report has been submitted.", status: "PENDING" },
+    { phase: "Phase 2", description: "The report is under review.", status: "UNDER_REVIEW" },
+    { phase: "Phase 3", description: "The report is now being studied.", status: "BEING_STUDIED" },
+    {
+      phase: "Phase 4",
+      description: "The report is being processed by the concerned office or organization.",
+      status: "BEING_PROCESS",
+    },
+    { phase: "Phase 5", description: "The issue has been resolved.", status: "RESOLVED" },
   ],
   features: [
     "User Login and Profile Information",

@@ -3,7 +3,8 @@
 import { useDroppable } from "@dnd-kit/core";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { KanbanCard } from "./kanban-card";
-import { ColumnType, Tickets } from "@/types";
+import { Tickets } from "@/types";
+import { ColumnType } from "../constants/type";
 
 interface KanbanColumnProps {
   column: ColumnType;

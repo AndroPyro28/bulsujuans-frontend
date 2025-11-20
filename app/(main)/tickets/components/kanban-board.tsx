@@ -1,38 +1,10 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ColumnType, Pagination, Tickets } from "@/types";
-import { fetchTickets } from "@/lib/api";
+import { Pagination, Tickets } from "@/types";
 import { KanbanColumn } from "./kanban-column";
 import { useQueryProcessor } from "@/hooks/useTanstackQuery";
-
-const COLUMNS: ColumnType[] = ["PENDING", "RESOLVED", "REJECTED"];
-
-const COLUMN_LABELS: Record<ColumnType, string> = {
-  PENDING: "Pending",
-  RESOLVED: "Resolved",
-  REJECTED: "Rejected",
-};
-
-const COLUMN_COLORS: Record<ColumnType, { bg: string; badge: string; label: string }> = {
-  PENDING: {
-    bg: "bg-amber-50 dark:bg-amber-950/30",
-    badge: "bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-200",
-    label: "text-amber-700 dark:text-amber-400",
-  },
-  RESOLVED: {
-    bg: "bg-emerald-50 dark:bg-emerald-950/30",
-    badge: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-200",
-    label: "text-emerald-700 dark:text-emerald-400",
-  },
-  REJECTED: {
-    bg: "bg-red-50 dark:bg-red-950/30",
-    badge: "bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200",
-    label: "text-red-700 dark:text-red-400",
-  },
-};
+import { COLUMN_LABELS, COLUMNS, ticketStatusConfig } from "../constants/type";
 
 export interface TicketsQuery {
   data: Tickets[];
@@ -42,11 +14,6 @@ export interface TicketsQuery {
 }
 
 export function KanbanBoard() {
-  // const { data: tickets = [], isLoading } = useQuery<Tickets[]>({
-  //   queryKey: ["tickets"],
-  //   queryFn: fetchTickets,
-  // });
-
   const { data, isLoading } = useQueryProcessor<TicketsQuery>({
     url: "/tickets/list",
     queryParams: {},
@@ -74,7 +41,7 @@ export function KanbanBoard() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {COLUMNS.map((column) => {
             const columnTickets = tickets.filter((t) => t.status === column);
-            const colors = COLUMN_COLORS[column];
+            const colors = ticketStatusConfig[column];
 
             return (
               <div key={column} className="flex flex-col h-full">

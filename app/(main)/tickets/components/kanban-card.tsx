@@ -9,12 +9,19 @@ import { Button } from "@/components/ui/button";
 import { formatStatus } from "@/lib/utils";
 import Link from "next/link";
 import { ticketStatusConfig } from "../constants/type";
+import { useAuth } from "@/hooks/useAuth";
 
 interface KanbanCardProps {
   ticket: Tickets;
 }
 
 export function KanbanCard({ ticket }: KanbanCardProps) {
+  const auth = useAuth();
+
+  const canViewComplaintDetail = auth.hasPermission("complaint:view_detail");
+  const canDeleteTicketDetail = auth.hasPermission("tickets:delete");
+  const canEditTicketDetail = auth.hasPermission("tickets:edit");
+
   const {
     attributes,
     listeners,
@@ -23,7 +30,7 @@ export function KanbanCard({ ticket }: KanbanCardProps) {
     transition,
     isDragging,
     // isOverlay,
-  } = useSortable({ id: ticket.id });
+  } = useSortable({ id: ticket.id, disabled: !canEditTicketDetail });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -52,14 +59,16 @@ export function KanbanCard({ ticket }: KanbanCardProps) {
       >
         <div className="flex gap-3">
           {/* Drag Handle */}
-          <button
-            {...attributes}
-            {...listeners}
-            className="flex-shrink-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-grab active:cursor-grabbing"
-            title="Drag to reorder or move to another column"
-          >
-            <GripVertical className="h-5 w-5 mt-1" />
-          </button>
+          {canEditTicketDetail && (
+            <button
+              {...attributes}
+              {...listeners}
+              className="flex-shrink-0 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-grab active:cursor-grabbing"
+              title="Drag to reorder or move to another column"
+            >
+              <GripVertical className="h-5 w-5 mt-1" />
+            </button>
+          )}
 
           {/* Content */}
           <div className="flex-1 min-w-0">
@@ -85,7 +94,7 @@ export function KanbanCard({ ticket }: KanbanCardProps) {
 
             {/* ID Badge */}
             <div className="flex justify-end gap-2 mt-2 pt-2 border-t border-slate-200/50 dark:border-slate-700/50">
-              <Button variant="outline" asChild className="text-xs">
+              <Button variant="outline" asChild className="text-xs" disabled={!canViewComplaintDetail}>
                 <Link href={`/complaints/${ticket.complaint_id}`} target="_blank" rel="noopener noreferrer">
                   View
                 </Link>
@@ -93,7 +102,7 @@ export function KanbanCard({ ticket }: KanbanCardProps) {
 
               {ticket.status === "REJECTED" ||
                 (ticket.status === "RESOLVED" && (
-                  <Button variant="destructive" size={"sm"} className="text-xs">
+                  <Button variant="destructive" size={"sm"} className="text-xs" disabled={!canDeleteTicketDetail}>
                     Archive
                   </Button>
                 ))}

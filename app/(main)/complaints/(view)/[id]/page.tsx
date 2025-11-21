@@ -5,6 +5,8 @@ import { Complaint } from "@/types";
 import { useParams } from "next/navigation";
 import React from "react";
 import { ComplaintDetailView } from "./components/complaint-detail-view";
+import { is } from "zod/v4/locales";
+import { PageLoading } from "@/components/page-loading";
 
 export interface ComplaintQuery {
   data: Complaint;
@@ -15,7 +17,7 @@ export interface ComplaintQuery {
 const Page = () => {
   const params = useParams();
   const complaint_id = params.id;
-  const { data } = useQueryProcessor<ComplaintQuery>({
+  const { data, isPending } = useQueryProcessor<ComplaintQuery>({
     url: `/complaints/show/${complaint_id}`,
     key: ["complaints", complaint_id],
     options: {
@@ -25,10 +27,10 @@ const Page = () => {
 
   const complaint = data?.data;
 
-  if (!complaint) {
+  if (isPending || !complaint) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-muted-foreground">Complaint not found</p>
+      <div className="w-full h-full p-10">
+        <PageLoading />
       </div>
     );
   }

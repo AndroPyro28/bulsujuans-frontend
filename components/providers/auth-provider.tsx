@@ -48,6 +48,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+
   const router = useRouter();
   const pathname = usePathname();
 
@@ -137,7 +138,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     router.push("/");
   };
 
-  if (isLoading && pathname !== "/") {
+  if (isLoading) {
     return <PageLoading />;
   }
 

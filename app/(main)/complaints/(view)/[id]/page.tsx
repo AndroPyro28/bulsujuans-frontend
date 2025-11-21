@@ -5,7 +5,6 @@ import { Complaint } from "@/types";
 import { useParams } from "next/navigation";
 import React from "react";
 import { ComplaintDetailView } from "./components/complaint-detail-view";
-import { is } from "zod/v4/locales";
 import { PageLoading } from "@/components/page-loading";
 
 export interface ComplaintQuery {

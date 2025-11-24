@@ -48,7 +48,6 @@ const Page = () => {
             </Button>
           </Link>
 
-          {/* edit button */}
           <Link href={`/complaints/edit/${data.data.id}`}>
             <Button>Edit</Button>
           </Link>

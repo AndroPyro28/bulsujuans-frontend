@@ -1,14 +1,15 @@
 "use client";
 
 import { useQueryProcessor } from "@/hooks/useTanstackQuery";
-import { Role } from "@/types";
-import { useParams } from "next/navigation";
+import { Access, Pagination, Role } from "@/types";
+import { useParams, useSearchParams } from "next/navigation";
 import React from "react";
 import { PageLoading } from "@/components/page-loading";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import RolwDetailView from "./components/role-detail-vew";
+import RoleAccessList from "./components/role-access-list";
 
 export interface RoleQuery {
   data: Role;
@@ -16,11 +17,22 @@ export interface RoleQuery {
   message: string;
 }
 
+export interface AccessQuery {
+  data: Access[];
+  success: boolean;
+  message: string;
+  pagination: Pagination;
+}
+
 const Page = () => {
+  const searchParams = useSearchParams();
   const params = useParams();
   const role_id = params.id;
 
-  const { data, isPending } = useQueryProcessor<RoleQuery>({
+  const ra_page = Number(searchParams.get("ra_page")) || 1;
+  const ra_search = searchParams.get("ra_search") || "";
+
+  const roleQuery = useQueryProcessor<RoleQuery>({
     url: `/roles/show/${role_id}`,
     key: ["roles", role_id],
     options: {
@@ -28,9 +40,23 @@ const Page = () => {
     },
   });
 
-  const role = data?.data;
+  const accessQuery = useQueryProcessor<AccessQuery>({
+    url: "/access/list",
+    queryParams: {
+      page: ra_page,
+      search: ra_search,
+      role_id,
+    },
+    key: ["access", ra_page, ra_search],
+    options: {
+      enabled: !!role_id,
+    },
+  });
 
-  if (isPending || !role) {
+  const role = roleQuery?.data?.data;
+  const access = accessQuery?.data?.data;
+
+  if (roleQuery.isPending || !role || !access) {
     return (
       <div className="w-full h-full p-10">
         <PageLoading />
@@ -56,6 +82,14 @@ const Page = () => {
 
         {/* Role Detaill*/}
         <RolwDetailView role={role} />
+
+        {/* Role Access  */}
+        <RoleAccessList
+          access={access!}
+          pageCount={accessQuery?.data?.pagination.totalPages ?? 1}
+          currentPage={ra_page}
+          search={ra_search}
+        />
       </div>
     </div>
   );

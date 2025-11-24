@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpDown, Eye, MoreHorizontal, Trash2 } from "lucide-react";
+import { ArrowUpDown, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import {
   DropdownMenu,
@@ -10,12 +10,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Role } from "@/types";
-import Link from "next/link";
+import { Access } from "@/types";
 import { useAuth } from "@/hooks/useAuth";
 import { formatDate } from "@/lib/utils";
 
-export const columns: ColumnDef<Role>[] = [
+export const columns: ColumnDef<Access>[] = [
   {
     accessorKey: "id",
     header: () => {
@@ -38,7 +37,7 @@ export const columns: ColumnDef<Role>[] = [
         className="text-[#181a19]  flex items-center cursor-pointer dark:text-white flex-1"
         onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
       >
-        System Role Name <ArrowUpDown className="ml-2 h-4 w-4" />
+        Access Name <ArrowUpDown className="ml-2 h-4 w-4" />
       </div>
     ),
     cell: ({ row }) => {
@@ -96,8 +95,8 @@ export const columns: ColumnDef<Role>[] = [
       const data = row.original;
       const auth = useAuth();
 
-      const canViewRoleDetail = auth.hasPermission("roles:view_detail");
-      const canDeleteRole = auth.hasPermission("roles:delete");
+      const canDeleteAccess = auth.hasPermission("access:delete");
+      const canEditAccess = auth.hasPermission("access:edit");
 
       return (
         <div className="flex justify-center items-center">
@@ -109,14 +108,12 @@ export const columns: ColumnDef<Role>[] = [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem className="flex items-center gap-2" disabled={!canViewRoleDetail}>
-                <Eye className="h-4 w-4 text-blue-500" />
-                <Link href={`/roles/${data.id}`}>View details</Link>
+              <DropdownMenuItem className="flex items-center gap-2" disabled={!canEditAccess}>
+                <Pencil className="h-4 w-4 text-blue-500" />
+                Edit
               </DropdownMenuItem>
-
               <DropdownMenuSeparator />
-
-              <DropdownMenuItem className="flex items-center gap-2 text-red-600" disabled={!canDeleteRole}>
+              <DropdownMenuItem className="flex items-center gap-2 text-red-600" disabled={!canDeleteAccess}>
                 <Trash2 className="h-4 w-4 text-red-600" />
                 <span>Remove</span>
               </DropdownMenuItem>

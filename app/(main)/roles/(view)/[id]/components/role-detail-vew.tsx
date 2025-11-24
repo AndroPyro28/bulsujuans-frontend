@@ -9,26 +9,12 @@ interface RoleDetailViewProps {
 }
 
 const RolwDetailView = ({ role }: RoleDetailViewProps) => {
-  const getRoleColor = (name: string) => {
-    const colors: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-      Administrator: "destructive",
-      Editor: "default",
-      Viewer: "secondary",
-      Moderator: "outline",
-      Analyst: "secondary",
-    };
-    return colors[name] || "default";
-  };
-
   return (
     <Card>
       <CardHeader>
         <div className="flex items-start justify-between gap-4">
           <div>
             <CardTitle className="mb-2 text-3xl">{formatText(role.name, "capitalized")}</CardTitle>
-            <Badge variant={getRoleColor(role.name)} className="w-fit">
-              Active
-            </Badge>
           </div>
         </div>
       </CardHeader>

@@ -23,9 +23,16 @@ interface DataTableProps<TData, TValue> {
   data: TData[];
   pageCount: number;
   currentPage: number;
+  pageKey?: string;
 }
 
-export function DataTable<TData, TValue>({ columns, data, pageCount, currentPage }: DataTableProps<TData, TValue>) {
+export function DataTable<TData, TValue>({
+  columns,
+  data,
+  pageCount,
+  currentPage,
+  pageKey = "page",
+}: DataTableProps<TData, TValue>) {
   const { setQuery } = useSetQuery();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
@@ -92,7 +99,7 @@ export function DataTable<TData, TValue>({ columns, data, pageCount, currentPage
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setQuery({ page: currentPage! - 1 })}
+            onClick={() => setQuery({ [pageKey]: currentPage! - 1 })}
             disabled={currentPage <= 1}
           >
             Previous
@@ -108,7 +115,7 @@ export function DataTable<TData, TValue>({ columns, data, pageCount, currentPage
                 key={i}
                 variant={page === currentPage ? "default" : "outline"}
                 size="sm"
-                onClick={() => setQuery({ page: Number(page) })}
+                onClick={() => setQuery({ [pageKey]: Number(page) })}
               >
                 {page}
               </Button>
@@ -118,7 +125,7 @@ export function DataTable<TData, TValue>({ columns, data, pageCount, currentPage
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setQuery({ page: currentPage + 1 })}
+            onClick={() => setQuery({ [pageKey]: currentPage + 1 })}
             disabled={currentPage >= pageCount}
           >
             Next

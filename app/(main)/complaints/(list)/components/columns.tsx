@@ -187,7 +187,7 @@ export const columns: ColumnDef<Complaint>[] = [
 
               <DropdownMenuItem className="flex items-center gap-2 text-red-600" disabled={!canDeleteComplaint}>
                 <Trash2 className="h-4 w-4 text-red-600" />
-                <span>Remove details</span>
+                <span>Remove</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

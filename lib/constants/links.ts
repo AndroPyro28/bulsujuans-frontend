@@ -1,4 +1,14 @@
-import { HandPlatter, House, LayoutDashboard, LucideIcon, Newspaper, Siren, Tickets, UserCog } from "lucide-react";
+import {
+  HandPlatter,
+  House,
+  LayoutDashboard,
+  LucideIcon,
+  Newspaper,
+  Siren,
+  Tickets,
+  UserCog,
+  UserLock,
+} from "lucide-react";
 import { Permission } from "./permissions";
 
 export type MenuLinkType = {
@@ -45,6 +55,12 @@ export const generaLinks: MenuLinkType[] = [
     url: "/users",
     icon: LayoutDashboard,
     access: Permission.USERS_VIEW_LIST,
+  },
+  {
+    title: "Roles",
+    url: "/roles",
+    icon: UserLock,
+    access: Permission.ROLES_VIEW_LIST,
   },
 ];
 

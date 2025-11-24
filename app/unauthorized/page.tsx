@@ -2,11 +2,13 @@
 
 import { Button } from "@/components/ui/button";
 import { Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty";
+import { useAuth } from "@/hooks/useAuth";
 import { ShieldAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function UnauthorizedPage() {
   const router = useRouter();
+  const auth = useAuth();
 
   return (
     <div className="h-full p-10">
@@ -21,14 +23,16 @@ export default function UnauthorizedPage() {
           </EmptyDescription>
         </EmptyHeader>
         <EmptyContent className="flex justify-center gap-3">
-          <Button
-            variant="outline"
-            size="sm"
-            className="border-red-500 text-red-700 hover:bg-red-100 dark:hover:bg-red-900/30"
-            onClick={() => router.push("/profile")}
-          >
-            Go to Profile
-          </Button>
+          {auth.isAuthenticated && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-red-500 text-red-700 hover:bg-red-100 dark:hover:bg-red-900/30"
+              onClick={() => router.push("/profile")}
+            >
+              Go to Profile
+            </Button>
+          )}
           <Button
             size="sm"
             className="bg-red-600 hover:bg-red-700 text-white dark:bg-red-700 dark:hover:bg-red-800"

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpDown, Eye, MoreHorizontal, Trash2 } from "lucide-react";
+import { ArrowUpDown, Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import {
   DropdownMenu,
@@ -112,6 +112,10 @@ export const columns: ColumnDef<Role>[] = [
               <DropdownMenuItem className="flex items-center gap-2" disabled={!canViewRoleDetail}>
                 <Eye className="h-4 w-4 text-blue-500" />
                 <Link href={`/roles/${data.id}`}>View details</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="flex items-center gap-2" disabled={!canViewRoleDetail}>
+                <Pencil className="h-4 w-4 text-blue-500" />
+                <Link href={`/roles/edit/${data.id}`}>Edit</Link>
               </DropdownMenuItem>
 
               <DropdownMenuSeparator />

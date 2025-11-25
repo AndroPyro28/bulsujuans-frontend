@@ -47,10 +47,6 @@ const Page = () => {
               Back to Roles
             </Button>
           </Link>
-
-          <Link href={`/complaints/edit/${data.data.id}`}>
-            <Button>Edit</Button>
-          </Link>
         </div>
 
         <ComplaintDetailView complaint={complaint} />

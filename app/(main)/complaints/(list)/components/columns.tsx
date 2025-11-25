@@ -1,5 +1,5 @@
 "use client";
-import { ArrowUpDown, Eye, MoreHorizontal, Trash2 } from "lucide-react";
+import { ArrowUpDown, Eye, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import {
   DropdownMenu,
@@ -166,6 +166,7 @@ export const columns: ColumnDef<Complaint>[] = [
       const auth = useAuth();
 
       const canViewComplaintDetai = auth.hasPermission("complaint:view_detail");
+      const canEditomplaint = auth.hasPermission("complaint:edit") && data.ticket.status === "PENDING";
       const canDeleteComplaint = auth.hasPermission("complaint:delete");
 
       return (
@@ -178,6 +179,11 @@ export const columns: ColumnDef<Complaint>[] = [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <DropdownMenuItem className="flex items-center gap-2" disabled={!canEditomplaint}>
+                <Pencil className="h-4 w-4 text-blue-500" />
+                <Link href={`/complaints/edit/${data.id}`}>Edit</Link>
+              </DropdownMenuItem>
+
               <DropdownMenuItem className="flex items-center gap-2" disabled={!canViewComplaintDetai}>
                 <Eye className="h-4 w-4 text-blue-500" />
                 <Link href={`/complaints/${data.id}`}>View details</Link>

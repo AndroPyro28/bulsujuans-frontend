@@ -36,7 +36,7 @@ export const RoleActions = ({ search }: RoleActionsProps) => {
       <div className="buttons">
         <Button
           variant={"default"}
-          onClick={() => router.push("/complaints/submit")}
+          onClick={() => router.push("/roles/create")}
           disabled={!canCreateComplaint}
           className="cursor-pointer font-light"
         >

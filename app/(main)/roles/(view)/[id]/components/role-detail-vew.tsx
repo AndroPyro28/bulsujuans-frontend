@@ -1,7 +1,6 @@
 import { Role } from "@/types";
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { formatDate, formatText } from "@/lib/utils";
 import { Calendar, Calendar1, FileText, Hash } from "lucide-react";
 interface RoleDetailViewProps {

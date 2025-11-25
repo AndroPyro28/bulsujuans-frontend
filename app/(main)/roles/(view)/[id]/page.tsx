@@ -56,7 +56,7 @@ const Page = () => {
   const role = roleQuery?.data?.data;
   const access = accessQuery?.data?.data;
 
-  if (roleQuery.isPending || !role || !access) {
+  if (roleQuery.isPending || !role) {
     return (
       <div className="w-full h-full p-10">
         <PageLoading />
@@ -74,22 +74,22 @@ const Page = () => {
               Back to Roles
             </Button>
           </Link>
-
-          <Link href={`/roles/edit/${role.id}`}>
-            <Button>Edit</Button>
-          </Link>
         </div>
 
         {/* Role Detaill*/}
         <RolwDetailView role={role} />
 
         {/* Role Access  */}
-        <RoleAccessList
-          access={access!}
-          pageCount={accessQuery?.data?.pagination.totalPages ?? 1}
-          currentPage={ra_page}
-          search={ra_search}
-        />
+        {access ? (
+          <RoleAccessList
+            access={access}
+            pageCount={accessQuery?.data?.pagination.totalPages ?? 1}
+            currentPage={ra_page}
+            search={ra_search}
+          />
+        ) : (
+          <PageLoading />
+        )}
       </div>
     </div>
   );

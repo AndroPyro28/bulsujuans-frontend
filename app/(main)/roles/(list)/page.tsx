@@ -1,48 +1,45 @@
 "use client";
 
 import React, { Suspense } from "react";
-import { UserActions } from "./components/user-actions";
-import { Complaint, Pagination } from "@/types";
+import { Pagination, Role } from "@/types";
 import { useQueryProcessor } from "@/hooks/useTanstackQuery";
 import { useAuth } from "@/hooks/useAuth";
 import { useSearchParams } from "next/navigation";
 import { PageLoading } from "@/components/page-loading";
+import { RoleActions } from "./components/role-actions";
 import { columns } from "./components/columns";
 import { DataTable } from "@/components/data-table";
 
-export interface ComplaintQuery {
-  data: Complaint[];
+export interface RoleQuery {
+  data: Role[];
   success: boolean;
   message: string;
   pagination: Pagination;
 }
 
-const ComplaintsClient = () => {
+const RolesClient = () => {
   const searchParams = useSearchParams();
   const { user } = useAuth();
 
   const page = Number(searchParams.get("page")) || 1;
   const search = searchParams.get("search") || "";
 
-  const complainant_id = user?.id;
-
-  const { data } = useQueryProcessor<ComplaintQuery>({
-    url: "/complaints/list",
+  const { data, isPending } = useQueryProcessor<RoleQuery>({
+    url: "/roles/list",
     queryParams: {
       page,
       search,
-      complainant_id,
     },
-    key: ["complaints", page, search, complainant_id],
+    key: ["roles", page, search],
   });
 
   return (
     <div className="w-full h-full p-10">
       <div className="flex flex-col gap-4">
         <div className="page-title">
-          <h1 className="text-2xl font-semibold">My complaints</h1>
+          <h1 className="text-2xl font-semibold">Roles</h1>
         </div>
-        <UserActions search={search} />
+        <RoleActions search={search} />
       </div>
 
       <div className="mt-14">
@@ -59,7 +56,7 @@ const ComplaintsClient = () => {
 
 const Page = () => (
   <Suspense fallback={<PageLoading />}>
-    <ComplaintsClient />
+    <RolesClient />
   </Suspense>
 );
 

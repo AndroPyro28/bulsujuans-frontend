@@ -39,10 +39,28 @@ export interface Tickets {
   deleted_at: string | null;
 }
 
+export interface Role {
+  id: string;
+  name: string;
+  desc: string;
+  createdAt: string;
+  updatedAt: string;
+  deleted_at: string | null;
+}
+
+export interface Access {
+  id: string;
+  code: string;
+  name: string;
+  desc: string;
+  roles: Role[];
+  createdAt: string;
+  updatedAt: string;
+  deleted_at: string | null;
+}
 export interface Pagination {
   total: number;
   page: number;
   limit: number;
   totalPages: number;
 }
-

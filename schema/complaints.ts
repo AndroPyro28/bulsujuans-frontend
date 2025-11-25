@@ -40,12 +40,10 @@ export const complaintsOptions = [
 export const ComplaintSchema = z.object({
   name: z
     .string("Name is required")
-    .min(1, "Name must be at least 1 character")
+    .min(3, "Name must be at least 3 character")
     .max(50, "Name must be at most 50 characters"),
   email: z.email("Email is required"),
-  contact_number: z
-    .string("Contact Number is required")
-    .min(1, "Contact Number is required"),
+  contact_number: z.string("Contact Number is required").min(1, "Contact Number is required"),
   alternate_contact_number: z.string().optional(),
   incident_detail: z
     .string("Incident Detail is required")

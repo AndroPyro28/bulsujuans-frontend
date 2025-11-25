@@ -6,6 +6,9 @@ import { useParams } from "next/navigation";
 import React from "react";
 import { ComplaintDetailView } from "./components/complaint-detail-view";
 import { PageLoading } from "@/components/page-loading";
+import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
+import Link from "next/link";
 
 export interface ComplaintQuery {
   data: Complaint;
@@ -36,7 +39,18 @@ const Page = () => {
 
   return (
     <div className="w-full h-full p-10">
-      <ComplaintDetailView complaint={complaint} />
+      <div className="flex flex-col gap-6">
+        <div className="flex items-center justify-between">
+          <Link href="/roles">
+            <Button variant="ghost">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Roles
+            </Button>
+          </Link>
+        </div>
+
+        <ComplaintDetailView complaint={complaint} />
+      </div>
     </div>
   );
 };

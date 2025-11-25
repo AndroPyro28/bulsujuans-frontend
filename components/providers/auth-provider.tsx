@@ -59,6 +59,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const fetchUser = async () => {
       const refreshToken = localStorage.getItem("refresh-token");
 
+      if (pathname === "/404") {
+        setIsLoading(false);
+        return;
+      }
+
       if (!refreshToken) {
         setIsLoading(false);
         return;
@@ -76,12 +81,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         } else {
           await login(data.auth, data.tokens.accessToken, data.tokens.refreshToken);
 
-          /* if current pathname is existing in the authorizedRoutePatterns redirect it eslse redirect to profile */
-          const route = authorizedRoutePatterns.find((r) => pathname.startsWith(r.url));
-
-          if (route) {
-            router.replace(pathname);
-          } else {
+          if (pathname === "/") {
             router.replace("/profile");
           }
         }

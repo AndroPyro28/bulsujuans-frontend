@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { GripVertical, Calendar } from "lucide-react";
 import { Tickets } from "@/types";
 import { Button } from "@/components/ui/button";
-import { formatStatus } from "@/lib/utils";
+import { formatText } from "@/lib/utils";
 import Link from "next/link";
 import { ticketStatusConfig } from "../constants/type";
 import { useAuth } from "@/hooks/useAuth";
@@ -84,7 +84,7 @@ export function KanbanCard({ ticket }: KanbanCardProps) {
                   ticketStatusConfig[ticket.status as keyof typeof ticketStatusConfig].status_color
                 } text-white`}
               >
-                {formatStatus(ticket.status, "upper")}
+                {formatText(ticket.status, "upper")}
               </span>
               <div className="flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
                 <Calendar className="h-3 w-3" />

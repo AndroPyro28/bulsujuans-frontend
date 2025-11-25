@@ -18,7 +18,7 @@ export function ComplaintDetailView({ complaint }: ComplaintDetailViewProps) {
   const StatusIcon = config.icon;
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <div className="min-h-screen bg-background">
       <div className="space-y-6">
         {/* Header Section */}
         <div className={`rounded-lg border p-6 ${config.color}`}>

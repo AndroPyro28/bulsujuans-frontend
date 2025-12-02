@@ -5,7 +5,8 @@ import { FormSubmitButton } from "@/components/form/form-submit-button";
 import { FormTextarea } from "@/components/form/form-textarea";
 import { Form } from "@/components/ui/form";
 import { useMutateProcessor } from "@/hooks/useTanstackQuery";
-import { storeRoleSchema, TStoreRoleSchema } from "@/schema/role";
+import { updateRoleSchema, TUpdateRoleSchema } from "@/schema/role";
+import { Role } from "@/types";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { NotepadText } from "lucide-react";
 import { useRouter } from "next/navigation";
@@ -13,30 +14,31 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
-const CreateRoleForm = () => {
+type EditRoleFormProps = {
+  data: Role;
+};
+
+const EditRoleForm = ({ data }: EditRoleFormProps) => {
   const router = useRouter();
 
-  const addComplaint = useMutateProcessor<TStoreRoleSchema | FormData, unknown>({
-    url: "/roles/store",
+  const addComplaint = useMutateProcessor<TUpdateRoleSchema | FormData, unknown>({
+    url: `/roles/update/${data.id}`,
     key: ["roles"],
-    method: "POST",
+    method: "PATCH",
   });
 
   const isSubmitting = addComplaint.status === "pending";
 
   const form = useForm({
-    defaultValues: {
-      name: "",
-      desc: "",
-    },
-    resolver: zodResolver(storeRoleSchema),
+    defaultValues: data,
+    resolver: zodResolver(updateRoleSchema),
     mode: "all",
     disabled: isSubmitting,
   });
 
   const isDisabled = form.formState.disabled;
 
-  const onSubmit = (data: TStoreRoleSchema) => {
+  const onSubmit = (data: TUpdateRoleSchema) => {
     addComplaint.mutate(data, {
       onSuccess: () => {
         form.reset();
@@ -80,4 +82,4 @@ const CreateRoleForm = () => {
   );
 };
 
-export default CreateRoleForm;
+export default EditRoleForm;

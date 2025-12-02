@@ -98,6 +98,7 @@ export const columns: ColumnDef<Role>[] = [
 
       const canViewRoleDetail = auth.hasPermission("roles:view_detail");
       const canDeleteRole = auth.hasPermission("roles:delete");
+      const canEditRole = auth.hasPermission("roles:edit");
 
       return (
         <div className="flex justify-center items-center">
@@ -109,18 +110,20 @@ export const columns: ColumnDef<Role>[] = [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem className="flex items-center gap-2" disabled={!canViewRoleDetail}>
-                <Eye className="h-4 w-4 text-blue-500" />
-                <Link href={`/roles/${data.id}`}>View details</Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem className="flex items-center gap-2" disabled={!canViewRoleDetail}>
-                <Pencil className="h-4 w-4 text-blue-500" />
-                <Link href={`/roles/edit/${data.id}`}>Edit</Link>
-              </DropdownMenuItem>
-
+              <Link href={`/roles/${data.id}`}>
+                <DropdownMenuItem className="flex items-center gap-2" disabled={!canViewRoleDetail}>
+                  <Eye className="h-4 w-4 text-blue-500" />
+                  View details
+                </DropdownMenuItem>
+              </Link>
+              <Link href={`/roles/edit/${data.id}`}>
+                <DropdownMenuItem className="flex items-center gap-2" disabled={!canEditRole}>
+                  <Pencil className="h-4 w-4 text-blue-500" />
+                  Edit
+                </DropdownMenuItem>
+              </Link>
               <DropdownMenuSeparator />
-
-              <DropdownMenuItem className="flex items-center gap-2 text-red-600" disabled={!canDeleteRole}>
+               <DropdownMenuItem className="flex items-center gap-2 text-red-600" disabled={!canDeleteRole}>
                 <Trash2 className="h-4 w-4 text-red-600" />
                 <span>Remove</span>
               </DropdownMenuItem>

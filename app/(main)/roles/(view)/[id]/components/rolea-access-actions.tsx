@@ -40,7 +40,7 @@ export const RoleAccessActions = ({ search }: RoleAccessActionsProps) => {
           disabled={!canCreateComplaint}
           className="cursor-pointer font-light"
         >
-          Create Role Access
+          Add Access
         </Button>
       </div>
     </div>

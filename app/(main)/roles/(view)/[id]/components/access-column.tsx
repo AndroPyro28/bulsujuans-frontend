@@ -13,6 +13,11 @@ import { Button } from "@/components/ui/button";
 import { Access } from "@/types";
 import { useAuth } from "@/hooks/useAuth";
 import { formatDate } from "@/lib/utils";
+import Link from "next/link";
+import { useConfirm } from "@/hooks/use-confirm";
+import { TUpdateAccessSchema } from "@/schema/access";
+import { useMutateProcessor } from "@/hooks/useTanstackQuery";
+import { useParams } from "next/navigation";
 
 export const columns: ColumnDef<Access>[] = [
   {
@@ -92,14 +97,43 @@ export const columns: ColumnDef<Access>[] = [
     size: 50,
     minSize: 50,
     cell: ({ row }) => {
+      const params = useParams();
+
       const data = row.original;
       const auth = useAuth();
 
+      const [DeleteRoleConfirmDialog, confirm] = useConfirm(
+        "Are you sure?",
+        "You are about to delete this record. This action is permanent and cannot be undone."
+      );
+
       const canDeleteAccess = auth.hasPermission("access:delete");
-      const canEditAccess = auth.hasPermission("access:edit");
+      const role_id = params.id;
+
+      const deleteAccess = useMutateProcessor<TUpdateAccessSchema, unknown>({
+        url: `/access/destroy_ra/${data.id}?role_id=${role_id}`,
+        key: ["access"],
+        method: "DELETE",
+      });
+
+      const onDelete = async () => {
+        const confirmed = await confirm();
+
+        if (confirmed) {
+          deleteAccess.mutate(
+            {},
+            {
+              onSuccess: () => {
+                console.log("Access deleted successfully");
+              },
+            }
+          );
+        }
+      };
 
       return (
         <div className="flex justify-center items-center">
+          <DeleteRoleConfirmDialog />
           <DropdownMenu>
             <DropdownMenuTrigger asChild className="bg-blue-500/30 text-slate-900 cursor-pointer">
               <Button variant="ghost" className="h-8 w-8 p-0">
@@ -108,12 +142,11 @@ export const columns: ColumnDef<Access>[] = [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem className="flex items-center gap-2" disabled={!canEditAccess}>
-                <Pencil className="h-4 w-4 text-blue-500" />
-                Edit
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="flex items-center gap-2 text-red-600" disabled={!canDeleteAccess}>
+              <DropdownMenuItem
+                className="flex items-center gap-2 text-red-600"
+                disabled={!canDeleteAccess}
+                onClick={onDelete}
+              >
                 <Trash2 className="h-4 w-4 text-red-600" />
                 <span>Remove</span>
               </DropdownMenuItem>

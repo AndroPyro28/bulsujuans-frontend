@@ -82,6 +82,7 @@ const Page = () => {
         {/* Role Access  */}
         {access ? (
           <RoleAccessList
+            roleId={role_id as string}
             access={access}
             pageCount={accessQuery?.data?.pagination.totalPages ?? 1}
             currentPage={ra_page}

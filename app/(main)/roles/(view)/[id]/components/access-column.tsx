@@ -18,6 +18,8 @@ import { useConfirm } from "@/hooks/use-confirm";
 import { TUpdateAccessSchema } from "@/schema/access";
 import { useMutateProcessor } from "@/hooks/useTanstackQuery";
 import { useParams } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export const columns: ColumnDef<Access>[] = [
   {
@@ -98,6 +100,7 @@ export const columns: ColumnDef<Access>[] = [
     minSize: 50,
     cell: ({ row }) => {
       const params = useParams();
+      const queryClient = useQueryClient();
 
       const data = row.original;
       const auth = useAuth();
@@ -107,7 +110,7 @@ export const columns: ColumnDef<Access>[] = [
         "You are about to delete this record. This action is permanent and cannot be undone."
       );
 
-      const canDeleteAccess = auth.hasPermission("access:delete");
+      const canDeleteAccess = auth.hasAllPermissions(["roles:edit", "access:delete"]);
       const role_id = params.id;
 
       const deleteAccess = useMutateProcessor<TUpdateAccessSchema, unknown>({
@@ -118,13 +121,14 @@ export const columns: ColumnDef<Access>[] = [
 
       const onDelete = async () => {
         const confirmed = await confirm();
-
+ 
         if (confirmed) {
           deleteAccess.mutate(
             {},
             {
               onSuccess: () => {
-                console.log("Access deleted successfully");
+                queryClient.invalidateQueries({ queryKey: ["access-options"] });
+                toast.success("Access remove successfully");
               },
             }
           );

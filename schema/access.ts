@@ -1,7 +1,6 @@
 import z from "zod";
 
 export const AccessSchema = z.object({
-  // role_id: z.string().optional(),
   code: z
     .string("Name is required")
     .min(1, "Name must be at least 1 character")
@@ -16,7 +15,6 @@ export const AccessSchema = z.object({
 export type TAccessSchema = z.infer<typeof AccessSchema>;
 
 export const storeAccessSchema = AccessSchema.pick({
-  // role_id: true,
   code: true,
   name: true,
   desc: true,

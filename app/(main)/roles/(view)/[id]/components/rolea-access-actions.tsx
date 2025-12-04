@@ -9,9 +9,10 @@ import { useAuth } from "@/hooks/useAuth";
 
 export type RoleAccessActionsProps = {
   search: string;
+  roleId: string;
 };
 
-export const RoleAccessActions = ({ search }: RoleAccessActionsProps) => {
+export const RoleAccessActions = ({ search, roleId }: RoleAccessActionsProps) => {
   const router = useRouter();
   const auth = useAuth();
   const { setQuery } = useSetQuery();
@@ -36,11 +37,11 @@ export const RoleAccessActions = ({ search }: RoleAccessActionsProps) => {
       <div className="buttons">
         <Button
           variant={"default"}
-          onClick={() => router.push("/complaints/submit")}
+          onClick={() => router.push(`/roles/add-access/${roleId}`)}
           disabled={!canCreateComplaint}
           className="cursor-pointer font-light"
         >
-          Create Role Access
+          Add Access
         </Button>
       </div>
     </div>

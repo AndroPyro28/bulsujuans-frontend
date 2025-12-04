@@ -13,9 +13,10 @@ interface RoleAccessListProps {
   pageCount: number;
   currentPage: number;
   search: string;
+  roleId: string;
 }
 
-const RoleAccessList = ({ access, pageCount, currentPage, search }: RoleAccessListProps) => {
+const RoleAccessList = ({ access, pageCount, currentPage, search, roleId }: RoleAccessListProps) => {
   return (
     <Card>
       <CardHeader>
@@ -24,7 +25,7 @@ const RoleAccessList = ({ access, pageCount, currentPage, search }: RoleAccessLi
             <CardTitle className="mb-2 text-3xl">Role Access</CardTitle>
           </div>
           <div>
-            <RoleAccessActions search={search} />
+            <RoleAccessActions search={search} roleId={roleId} />
           </div>
         </div>
       </CardHeader>

@@ -1,8 +1,11 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function ProfileHeader() {
+  const auth = useAuth();
+
   return (
     <Card className="overflow-hidden">
       <div className="h-32 bg-gradient-to-r from-primary to-primary/60" />
@@ -14,8 +17,8 @@ export default function ProfileHeader() {
               <AvatarFallback>JD</AvatarFallback>
             </Avatar>
             <div className="pb-2">
-              <h2 className="text-2xl font-bold text-foreground">John Doe</h2>
-              <p className="text-muted-foreground">Product Designer</p>
+              <h2 className="text-2xl font-bold text-foreground">{auth.user?.name}</h2>
+              <p className="text-muted-foreground">{auth.user?.role}</p>
             </div>
           </div>
           <Button variant="outline">Edit Profile</Button>

@@ -46,30 +46,30 @@ const authorizedRoutePatterns = [...generaLinks, ...forYouLinks];
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const router = useRouter();
   const pathname = usePathname();
+  const isPrivatePath = authorizedRoutePatterns.find((r) => pathname.startsWith(r.url)) !== undefined;
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // ----------------------------
-  // FETCH USER USING REFRESH-TOKEN
+  // FETCH USER USING REFRESH-TOKEN AND VALIDATE PERMISSIONS
   // ----------------------------
   useEffect(() => {
-    const fetchUser = async () => {
-      const refreshToken = localStorage.getItem("refresh-token");
+    if (isPrivatePath) {
+      const fetchUser = async () => {
+        const refreshToken = localStorage.getItem("refresh-token");
 
-      if (pathname === "/404") {
-        setIsLoading(false);
-        return;
-      }
+        if (!refreshToken) {
+          router.replace("/");
+          return;
+        }
 
-      if (!refreshToken) {
-        setIsLoading(false);
-        return;
-      }
+        setIsLoading(true);
 
-      try {
         const res = await apiClient.post("/auth/refresh", {
           refreshToken,
         });
@@ -81,39 +81,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         } else {
           await login(data.auth, data.tokens.accessToken, data.tokens.refreshToken);
 
-          if (pathname === "/") {
-            router.replace("/profile");
+          const route = authorizedRoutePatterns.find((r) => pathname.startsWith(r.url));
+          if (route && !data.auth?.permissions?.includes(route.access)) {
+            router.replace("/unauthorized");
           }
         }
 
-        setTimeout(() => {
-          setIsLoading(false);
-        }, 700);
-      } catch (error) {
-        logout();
-      }
-    };
+        setIsLoading(false);
+      };
 
-    fetchUser();
-  }, []);
-
-  // ---------------------------------
-  // ROUTE PROTECTION
-  // ---------------------------------
-  useEffect(() => {
-    if (isAuthenticated && pathname !== "/") {
-      // check route permissions
-      const route = authorizedRoutePatterns.find((r) => pathname.startsWith(r.url));
-
-      if (route) {
-        const requiredPermission = route.access;
-
-        if (!hasPermission(requiredPermission)) {
-          router.replace("/unauthorized");
-        }
-      }
+      fetchUser();
     }
-  }, [isLoading, isAuthenticated, pathname, user]);
+  }, [pathname]);
 
   const hasRole = (role: string) => user?.role.includes(role) ?? false;
   const hasAnyRole = (roles: string[]) => roles.some((r) => user?.role.includes(r)) ?? false;
@@ -137,6 +116,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem("refresh-token");
     router.push("/");
   };
+
+  console.log("isLoading", isLoading);
 
   if (isLoading) {
     return <PageLoading />;

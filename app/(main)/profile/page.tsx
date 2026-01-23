@@ -14,8 +14,6 @@ const Page = () => {
     setExpandedSections((prev) => (prev.includes(section) ? prev.filter((s) => s !== section) : [...prev, section]));
   };
 
-  const auth = useAuth();
-
   return (
     <div className="w-full h-full p-10 space-y-10">
       <div className="">
@@ -29,9 +27,6 @@ const Page = () => {
       <ExperienceSection items={experienceData} />
       <EducationSection items={educationData} />
 
-      <pre className="text-xs bg-slate-900 text-white rounded-md">
-        <code>{JSON.stringify(auth.user, null, 2)}</code>
-      </pre>
       {/* <AdditionalSections expandedSections={expandedSections} toggleSection={toggleSection} /> */}
     </div>
   );
